@@ -39,3 +39,20 @@ class MypageView(views.APIView):
     mypage = get_object_or_404(MyPage, user=request.user)
     serializer = MyPageSerializer(mypage)
     return Response(serializer.data)
+
+  def patch(self, request):
+    # 로그인을 안한 경우 400 오류
+    if not request.user.is_authenticated:
+      return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
+    
+    # mypage가 생성되지 않은 유저인 경우 400 오류
+    if not MyPage.objects.filter(user=request.user).exists:
+      return Response({"error": "mypage가 생성되지 않은 유저입니다."}, status=HTTP_400_BAD_REQUEST)
+    
+    # mypage 반환
+    mypage = get_object_or_404(MyPage, user=request.user)
+    serializer = MyPageSerializer(mypage, data = request.data, partial=True)
+    if serializer.is_valid():
+      serializer.save()
+      return Response(serializer.data)
+    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
