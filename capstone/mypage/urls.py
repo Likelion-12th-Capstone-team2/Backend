@@ -6,5 +6,5 @@ app_name = 'mypage'
 
 urlpatterns=[
   path('', MypageView.as_view()),
-    
+  path('category/', CategoryView.as_view()),    
 ]

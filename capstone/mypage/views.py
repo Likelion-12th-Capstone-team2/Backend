@@ -7,6 +7,8 @@ from .models import *
 from .serializers import *
 
 # Create your views here.
+
+# MyPage Post, Get, Patch 뷰
 class MypageView(views.APIView):
 
   #온보딩에서 사용할 mypage 생성
@@ -55,4 +57,21 @@ class MypageView(views.APIView):
     if serializer.is_valid():
       serializer.save()
       return Response(serializer.data)
+    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+  
+
+
+# Category Post, Get 뷰
+class CategoryView(views.APIView):
+
+  # 카테고리 생성
+  def post(self, request):
+    # 로그인을 안한 경우 400 오류
+    if not request.user.is_authenticated:
+      return Response({"error": "로그인 후 카테고리를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
+    
+    serializer = CategorySerializer(data=request.data)
+    if serializer.is_valid():
+      serializer.save(user=request.user)
+      return Response(serializer.data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
