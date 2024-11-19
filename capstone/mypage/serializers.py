@@ -6,4 +6,4 @@ from .models import *
 class MyPageSerializer(serializers.ModelSerializer):
   class Meta:
     model = MyPage
-    fields = ['id', 'name', 'background_photo', 'color', 'typography', 'user']
+    fields = ['id', 'name', 'background_photo', 'color', 'typography']

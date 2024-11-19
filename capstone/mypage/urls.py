@@ -5,6 +5,6 @@ from mypage.views import *
 app_name = 'mypage'
 
 urlpatterns=[
-  path('/', MypageView.as_view()),
+  path('', MypageView.as_view()),
     
 ]
