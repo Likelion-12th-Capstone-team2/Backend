@@ -79,7 +79,7 @@ class CategoryView(views.APIView):
   def get(self, request):
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
-      return Response({"error": "로그인 후 카테고리를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
+      return Response({"error": "로그인 후 카테고리를 불러올 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
     # 로그인한 유저의 카테고리 객체 리스트
     categories = Category.objects.filter(user=request.user)
