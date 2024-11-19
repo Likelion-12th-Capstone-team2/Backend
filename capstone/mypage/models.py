@@ -7,4 +7,7 @@ class MyPage(models.Model):
   background_photo = models.ImageField(upload_to='backgrounds/')
   color = models.CharField(max_length=100)
   typography = models.CharField(max_length=300)
-  user = models.ForeignKey(User)
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+  def __str__(self):
+    return self.name
