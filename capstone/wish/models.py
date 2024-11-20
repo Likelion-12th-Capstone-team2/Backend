@@ -16,6 +16,7 @@ class Wish(models.Model):
   wish_link = models.CharField(max_length=10000)
   item_image = models.ImageField(upload_to='items/')
   item_name = models.CharField(max_length=1000)
+  price = models.IntegerField()
   size = models.CharField(max_length=100, null=True)
   color = models.CharField(max_length=100, null=True)
   other_option = models.CharField(max_length=100, null=True)
