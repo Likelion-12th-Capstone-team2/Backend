@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import *
+from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
 
 class UserSerializer(serializers.ModelSerializer):
     
@@ -58,3 +60,41 @@ class LoginSerializer(serializers.Serializer):
                 return data      
         else:
             raise serializers.ValidationError('존재하지않는 유저입니다.')  
+        
+class KakaoLoginSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=128)
+    password = serializers.CharField(max_length=128, write_only=True)
+
+    def create(self, validated_data):
+        email = validated_data.get("email")
+        password = validated_data.get("password")
+
+        # 이메일로 기존 사용자 확인
+        user = User.objects.filter(email=email).first()
+
+        if user:
+            # 비밀번호 확인
+            if not user.check_password(password):
+                raise ValidationError("잘못된 비밀번호입니다.")
+        else:
+            # 새 사용자 생성
+            user = User.objects.create(
+                email=email,
+                username=f"kakao_{email.split('@')[0]}",
+                password=make_password(password),
+            )
+        
+        # 사용자 객체 반환
+        return user
+    
+    def validate(self, data):
+        email = data.get("email", None)
+        password = data.get("password", None)
+
+        if not email:
+            raise serializers.ValidationError(_('이메일이 필요합니다(필수 정보 누락)'))
+
+        if not password:
+            raise serializers.ValidationError(_('비밀번호가 필요합니다'))
+
+        return data
