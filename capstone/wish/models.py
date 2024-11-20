@@ -23,3 +23,6 @@ class Wish(models.Model):
 
   #카테고리 정보
   category = models.ManyToManyField(Category)
+
+  def __str__(self):
+    return self.name
