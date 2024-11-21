@@ -42,7 +42,7 @@ class MypageView(views.APIView):
 
     data = {
       "user": request.user.id,
-      "mypage": serializer.data
+      "setting": serializer.data
     }
 
     return Response(data=data, status=HTTP_200_OK)
