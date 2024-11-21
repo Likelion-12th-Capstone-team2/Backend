@@ -104,16 +104,47 @@ class WishItemView(views.APIView):
     cateogory = get_object_or_404(Category, id=wish_items_serializer.data['category'])
     cateogory_serializer = CategorySerializer(cateogory)
 
-    wish_items_serializer.data['cateogory'] = cateogory_serializer.data['category']
-
-    data = {
+    # 데이터를 새로 구성
+    data = dict(wish_items_serializer.data)
+    data['category'] = cateogory_serializer.data['category'] 
+      
+    response_data = {
       'user': user,
-      'data': wish_items_serializer.data
+      'item': data
     }
 
     return Response(data=data, status=HTTP_200_OK)
 
-  # def patch(self, request, user_id, item_id):
+  def patch(self, request, user_id, item_id):
+    # 로그인을 안한 경우 400 오류
+    if not request.user.is_authenticated:
+      return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
+    
+    # user_id가 현재 접근하고 있는 유저인지 확인
+    if user_id != request.user.id:
+      return Response({"error": "위시 아이템을 수정할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
+    
+    wishitem = get_object_or_404(Wish, id=item_id)
+    wish_items_serializer = WishItemGetSerializer(wishitem, data=request.data, partial=True)
+
+    if wish_items_serializer.is_valid():
+      wish_items_serializer.save()
+
+      cateogory = get_object_or_404(Category, id=wish_items_serializer.data['category'])
+      cateogory_serializer = CategorySerializer(cateogory)
+
+      # 데이터를 새로 구성
+      data = dict(wish_items_serializer.data)
+      data['category'] = cateogory_serializer.data['category'] 
+        
+      
+
+      return Response(data=data, status=HTTP_200_OK)
+    
+    else:
+      return Response({"error": wish_items_serializer.errors}, status=HTTP_400_BAD_REQUEST)
+
+
 
 
   # def delete(self, request, user_id, item_id):
