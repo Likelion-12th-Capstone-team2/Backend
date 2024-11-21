@@ -39,7 +39,13 @@ class MypageView(views.APIView):
     # mypage 반환
     mypage = get_object_or_404(MyPage, user=request.user)
     serializer = MyPageSerializer(mypage)
-    return Response(serializer.data)
+
+    data = {
+      "user": request.user.id,
+      "mypage": serializer.data
+    }
+
+    return Response(data=data, status=HTTP_200_OK)
 
   def patch(self, request):
     # 로그인을 안한 경우 400 오류
@@ -72,7 +78,8 @@ class CategoryView(views.APIView):
     if Category.objects.filter(user_id=request.user.id).count > 7:
       return Response({"error": "카테고리는 최대 7개까지만 설정 가능합니다."}, status=HTTP_400_BAD_REQUEST)
     
-    
+    if Category.objects.filter(user_id=request.user.id, category=request.data['category']).exists():
+      return Response({"error": "이미 존재하는 카테고리입니다."}, status=HTTP_400_BAD_REQUEST) 
 
     serializer = CategorySerializer(data=request.data)
     if serializer.is_valid():
