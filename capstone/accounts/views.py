@@ -98,6 +98,9 @@ class KakaoCallbackView(views.APIView):
             if serializer.is_valid():
                 validated_data = serializer.validated_data
                 validated_data['exist'] = True
+                # 로그인 후 발급된 access token과 함께 응답
+                validated_data['access_token'] = access_token
+                
                 return Response({'message': "카카오 로그인 성공", 'data': validated_data}, status=HTTP_200_OK)
             return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
@@ -114,7 +117,7 @@ class KakaoSignupView(views.APIView):
 
         # 회원가입 데이터를 구성
         request_data = {
-            'email': f"KakaoUser_{email}",  # KakaoUser prefix 추가
+            'email': f"{email}",  # KakaoUser prefix 추가
             'password': KAKAO_PASSWORD,  # 미리 정의된 카카오 비밀번호 사용
         }
 
@@ -122,12 +125,18 @@ class KakaoSignupView(views.APIView):
         serializer = KakaoLoginSerializer(data=request_data)
         if serializer.is_valid():
             user = serializer.save()
+
+            # JWT 토큰 발급
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
             user_data = {
                 'id': user.id,
                 'email': user.email,
-                'username': user.username
+                'username': user.username,
+                'access_token': access_token,  # 로그인 후 사용할 access token
                 } 
-            return Response({'message': '카카오 회원가입 완료', 'data': user_data}, status=HTTP_201_CREATED)
-        return Response({'message': '카카오 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+            return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
+        return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
     

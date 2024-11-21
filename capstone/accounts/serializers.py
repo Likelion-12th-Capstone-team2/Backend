@@ -92,9 +92,9 @@ class KakaoLoginSerializer(serializers.Serializer):
         password = data.get("password", None)
 
         if not email:
-            raise serializers.ValidationError(_('이메일이 필요합니다(필수 정보 누락)'))
+            raise serializers.ValidationError(('이메일이 필요합니다(필수 정보 누락)'))
 
         if not password:
-            raise serializers.ValidationError(_('비밀번호가 필요합니다'))
+            raise serializers.ValidationError(('비밀번호가 필요합니다'))
 
         return data
