@@ -75,7 +75,7 @@ class CategoryView(views.APIView):
     if not request.user.is_authenticated:
       return Response({"error": "로그인 후 카테고리를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
-    if Category.objects.filter(user_id=request.user.id).count() > 7:
+    if Category.objects.filter(user_id=request.user.id).count() >= 7:
       return Response({"error": "카테고리는 최대 7개까지만 설정 가능합니다."}, status=HTTP_400_BAD_REQUEST)
     
     if Category.objects.filter(user_id=request.user.id, category=request.data['category']).exists():
