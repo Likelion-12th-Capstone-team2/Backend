@@ -131,6 +131,10 @@ SIMPLE_JWT = {
 }
 
 
+#이미지 관련 설정
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 ROOT_URLCONF = 'capstone.urls'
 
