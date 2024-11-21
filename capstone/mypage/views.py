@@ -24,7 +24,11 @@ class MypageView(views.APIView):
     serializer = MyPageSerializer(data=request.data)
     if serializer.is_valid():
       serializer.save(user=request.user)
-      return Response(serializer.data, status=HTTP_200_OK)
+      data = {
+        "user": request.user.id,
+        "setting": serializer._data
+      }
+      return Response(data=data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
   def get(self, request):
@@ -61,7 +65,11 @@ class MypageView(views.APIView):
     serializer = MyPageSerializer(mypage, data = request.data, partial=True)
     if serializer.is_valid():
       serializer.save()
-      return Response(serializer.data)
+      data = {
+        "user": request.user.id,
+        "setting": serializer._data
+      }
+      return Response(data=data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
   
 
