@@ -7,11 +7,11 @@ from mypage.models import Category
 # 위시아이템 모델
 class Wish(models.Model):
   # wish로 설정한 유저 정보
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
 
   is_sended = models.BooleanField(default=False)
   # 준 유저 정보
-  sender = models.ForeignKey(User, on_delete=models.CASCADE)
+  sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', null=True)
 
   wish_link = models.CharField(max_length=10000)
   item_image = models.ImageField(upload_to='items/')
@@ -23,7 +23,7 @@ class Wish(models.Model):
   heart = models.IntegerField()
 
   #카테고리 정보
-  category = models.ManyToManyField(Category)
+  category = models.ForeignKey(Category, on_delete=models.PROTECT)
 
   def __str__(self):
     return self.name
