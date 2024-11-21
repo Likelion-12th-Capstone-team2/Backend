@@ -4,6 +4,7 @@ from rest_framework.status import *
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
+from rest_framework import status 
 
 # Create your views here.
 
@@ -109,7 +110,7 @@ class CategoryView(views.APIView):
 # 카테고리 수정 (PATCH)
   def patch(self, request, category_id):
         if not request.user.is_authenticated:
-            return Response({"error": "로그인 후 카테고리를 삭제하세요"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "로그인 후 카테고리를 수정하세요"}, status=status.HTTP_400_BAD_REQUEST)
         
         # 해당 카테고리 존재 여부 확인
         category = Category.objects.filter(user=request.user, id=category_id).first()

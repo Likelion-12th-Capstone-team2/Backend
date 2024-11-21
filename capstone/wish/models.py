@@ -26,4 +26,5 @@ class Wish(models.Model):
   category = models.ForeignKey(Category, on_delete=models.PROTECT)
 
   def __str__(self):
-    return self.name
+    return self.item_name 
+  #반환값이 name으로 되어 있어서 item_name으로 수정하였음

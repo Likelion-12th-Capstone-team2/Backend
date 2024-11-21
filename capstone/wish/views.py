@@ -87,7 +87,7 @@ class WishView(views.APIView):
     if serializer.is_valid():
       serializer.save(user=request.user)
       return Response(serializer.data, status=HTTP_200_OK)
-    return Response(serializer.error, status=HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
   
 
@@ -155,8 +155,22 @@ class WishItemView(views.APIView):
     else:
       return Response({"error": wish_items_serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
-  # def delete(self, request, user_id, item_id):
+  def delete(self, request, user_id, item_id):
+    # 로그인을 안한 경우 400 오류
+    if not request.user.is_authenticated:
+      return Response({"error": "로그인 후 위시 아이템을 삭제할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
+    # user_id가 현재 접근하고 있는 유저인지 확인
+    if user_id != request.user.id:
+      return Response({"error": "위시 아이템을 삭제할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
+
+    # 해당 아이템이 존재하는지 확인
+    wishitem = get_object_or_404(Wish, id=item_id)
+
+    # 위시 아이템 삭제
+    wishitem.delete()
+
+    return Response({"message": "위시 아이템 삭제 성공!"}, status=HTTP_204_NO_CONTENT)
 
 # 위시 선물 찜하기
 class SendView(views.APIView):
