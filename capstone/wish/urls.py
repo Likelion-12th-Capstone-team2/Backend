@@ -5,5 +5,5 @@ from .views import *
 app_name = 'wish'
 
 urlpatterns=[
-  path('<int:user_id>/', .as_view()),   
+  path('<int:user_id>/', WishView.as_view()),
 ]
