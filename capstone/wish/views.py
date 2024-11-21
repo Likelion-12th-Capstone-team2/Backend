@@ -165,6 +165,21 @@ class SendView(views.APIView):
     if not request.user.is_authenticated:
       return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
+    if request.user.id == user_id:
+      return Response({"error": "자기 자신한테 선물할 수 없습니다."}, status=HTTP_400_BAD_REQUEST)
+
+    wishitem = get_object_or_404(Wish, id=item_id)
+    
+    data = {
+      'is_sended': True,
+      'sender': request.user.id
+    }
+    serializer = WishItemGetSerializer(wishitem, data=data, partial=True)
+
+    if serializer.is_valid():
+      serializer.save()
+      return Response(serializer.data, status=HTTP_200_OK)
+    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 
