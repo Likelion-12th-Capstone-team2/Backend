@@ -3,18 +3,21 @@ from rest_framework import views
 from rest_framework.status import *
 from rest_framework.response import Response
 from .models import *
-from mypage.models import Category
+from mypage.models import Category, MyPage
 from .serializers import *
-from mypage.serializers import CategorySerializer
+from mypage.serializers import CategorySerializer, MyPageSerializer
 
 class WishView(views.APIView):
   # 위시 리스트 조회
   def get(self, request, user_id):
 
-    # 내 페이지인지 확인
-    is_owner = False
-    if request.user.id == user_id:
-      is_owner = True
+    # 현재 접속하고 있는 유저 (wish 주인: owner, 타인: user_id, 로그인하지 않은 경우: guest)
+    if not request.user.is_authenticated:
+      user = 'guest'
+    elif user_id == request.user.id:
+      user = 'owner'
+    else:
+      user = request.user.id
     
     # 카테고리 목록 조회
     category_list = Category.objects.filter(user=user_id)
@@ -57,10 +60,14 @@ class WishView(views.APIView):
     category_serializer = CategorySerializer(category_list, many=True)
     wish_items_serializer = WishListGetSerializer(wish_items, many=True)
 
+    page = get_object_or_404(MyPage, user=user_id)
+    mypage_serializer = MyPageSerializer(page)
+
     data = {
-      'is_owner': is_owner,
+      'user': user,
       'catagory': category_serializer.data,
-      'wish_items': wish_items_serializer.data
+      'wish_items': wish_items_serializer.data,
+      'setting': mypage_serializer.data
     }
     
     return Response(data=data, status=HTTP_200_OK)
