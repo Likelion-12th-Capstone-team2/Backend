@@ -24,7 +24,7 @@ class WishView(views.APIView):
 
     # 쿼리 파라미터 조회
     price = request.GET.get('price')
-    category = int(request.GET.get('category'))
+    category = request.GET.get('category')
 
     # 가격대별 필터링
     match price:
@@ -48,9 +48,9 @@ class WishView(views.APIView):
     
     # 카테고리
     if category:
-      if category_list.filter(id=category).exists():
+      if category_list.filter(id=int(category)).exists():
         
-        wish_items = wish_items.filter(category=category)
+        wish_items = wish_items.filter(category=int(category))
       else:
         return Response({"error": "존재하지 않는 category입니다."}, status=HTTP_400_BAD_REQUEST)
     
@@ -85,12 +85,36 @@ class WishView(views.APIView):
   
 
 
-# # 특정 위시 아이템 조회, 수정, 삭제 
-# class WishItemView(views.APIView):
+# 특정 위시 아이템 조회, 수정, 삭제 
+class WishItemView(views.APIView):
     
-#   # 특정 위시 아이템 조회
-#   def get(self, pk, pk):
+  # 특정 위시 아이템 조회
+  def get(self, request, user_id, item_id):
+    # 현재 접속하고 있는 유저 (wish 주인: owner, 타인: user_id, 로그인하지 않은 경우: guest)
+    if not request.user.is_authenticated:
+      user = 'guest'
+    elif user_id == request.user.id:
+      user = 'owner'
+    else:
+      user = request.user.id
 
-#   def patch(self, request, pk):
+    wishitem = get_object_or_404(Wish, id=item_id)
+    wish_items_serializer = WishItemGetSerializer(wishitem)
 
-#   def delete(self,pk):
+    cateogory = get_object_or_404(Category, id=wish_items_serializer.data['category'])
+    cateogory_serializer = CategorySerializer(cateogory)
+
+    wish_items_serializer.data['cateogory'] = cateogory_serializer.data['category']
+
+    data = {
+      'user': user,
+      'data': wish_items_serializer.data
+    }
+
+    return Response(data=data, status=HTTP_200_OK)
+
+  # def patch(self, request, user_id, item_id):
+
+
+  # def delete(self, request, user_id, item_id):
+

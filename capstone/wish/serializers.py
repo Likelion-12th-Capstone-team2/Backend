@@ -13,3 +13,7 @@ class WishPostSerializer(serializers.ModelSerializer):
     model = Wish
     fields = ['id', 'item_name', 'wish_link', 'item_image', 'price', 'size', 'color', 'other_option', 'heart', 'category']
 
+class WishItemGetSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Wish
+    fields = ['id', 'item_image', 'item_name', 'price', 'size', 'color', 'other_option', 'heart', 'is_sended', 'sender', 'category']
