@@ -2,7 +2,6 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import views
 from rest_framework.status import *
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import *
 from .serializers import *
 
