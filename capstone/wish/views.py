@@ -94,7 +94,6 @@ class WishView(views.APIView):
 
 # 특정 위시 아이템 조회, 수정, 삭제 
 class WishItemView(views.APIView):
-    
   # 특정 위시 아이템 조회
   def get(self, request, user_id, item_id):
     # 현재 접속하고 있는 유저 (wish 주인: owner, 타인: user_id, 로그인하지 않은 경우: guest)
@@ -114,13 +113,18 @@ class WishItemView(views.APIView):
     # 데이터를 새로 구성
     data = dict(wish_items_serializer.data)
     data['category'] = cateogory_serializer.data['category'] 
+
+    page = get_object_or_404(MyPage, user=user_id)
+    mypage_serializer = MyPageSerializer(page)
+
       
     response_data = {
       'user': user,
-      'item': data
+      'item': data,
+      'setting': mypage_serializer.data
     }
 
-    return Response(data=data, status=HTTP_200_OK)
+    return Response(data=response_data, status=HTTP_200_OK)
 
   def patch(self, request, user_id, item_id):
     # 로그인을 안한 경우 400 오류
