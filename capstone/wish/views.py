@@ -129,7 +129,7 @@ class WishItemView(views.APIView):
   def patch(self, request, user_id, item_id):
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
-      return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
+      return Response({"error": "로그인 후 위시 아이템을 수정할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
     # user_id가 현재 접근하고 있는 유저인지 확인
     if user_id != request.user.id:
@@ -155,8 +155,16 @@ class WishItemView(views.APIView):
     else:
       return Response({"error": wish_items_serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
-
-
-
   # def delete(self, request, user_id, item_id):
+    
+
+# 위시 선물 찜하기
+class SendView(views.APIView):
+  def post(self, request, user_id, item_id):
+    # 로그인을 안한 경우 400 오류
+    if not request.user.is_authenticated:
+      return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
+    
+
+
 
