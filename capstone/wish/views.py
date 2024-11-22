@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from rest_framework import views
 from rest_framework.status import *
 from rest_framework.response import Response
@@ -196,4 +196,24 @@ class SendView(views.APIView):
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-
+#다른 사람 위시리스트의 위시 -> 내 위시리스트로 가져오기
+class ToMyWishView(views.APIView):
+  def get(self, request, item_id):
+    # 로그인 여부 확인
+    if not request.user.is_authenticated:
+      return Response(
+                {"message": "로그인이 필요합니다. 로그인 페이지로 이동하세요."}, 
+                status=HTTP_401_UNAUTHORIZED
+            )
+        
+    try:
+      target_wish = Wish.objects.get(id=item_id)
+    except Wish.DoesNotExist:
+      return Response({"error": "불러올 아이템이 존재하지 않습니다"}, status = HTTP_404_NOT_FOUND)
+    
+    if target_wish.user == request.user:
+      return Response({"error":"이미 본인의 위시 아이템으로 등록되어 있습니다."}, status=HTTP_400_BAD_REQUEST)
+    
+    #불러온 wish 정보를 반환
+    serializer = ToMyWishSerializer(target_wish)
+    return Response(serializer.data, status=HTTP_200_OK)
