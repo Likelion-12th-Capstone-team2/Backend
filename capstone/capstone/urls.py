@@ -9,5 +9,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('mypages/', include('mypage.urls')),
     path('wish/', include('wish.urls')),
+    path('crawler/', include('crawler.urls')),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
-

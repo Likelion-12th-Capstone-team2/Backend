@@ -121,6 +121,14 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',  # 로컬 개발 환경
+    # 'https://yourdomain.com',  # 배포 도메인 추가
+]
+
+CSRF_COOKIE_SECURE = False  # 로컬 개발 환경에서만 False로 설정
+SESSION_COOKIE_SECURE = False  # 로컬 개발 환경에서만 False로 설정
+
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None #username 필드 사용 안함
 ACCOUNT_EMAIL_REQUIRED = True # email 필드 사용한다는 뜻
 ACCOUNT_UNIQUE_EMAIL = True #username 필드 사용 안함
