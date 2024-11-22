@@ -19,4 +19,4 @@ class MyPage(models.Model):
 # 카테고리 모델
 class Category(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
-  category = models.CharField(max_length=100)
+  category = models.CharField(max_length=11)
