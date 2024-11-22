@@ -57,4 +57,4 @@ class LoginSerializer(serializers.Serializer):
                 }
                 return data      
         else:
-            raise serializers.ValidationError('존재하지않는 유저입니다.')  
+            raise serializers.ValidationError('존재하지 않는 유저입니다.')  

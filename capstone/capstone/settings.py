@@ -2,6 +2,11 @@ from pathlib import Path
 import os
 from datetime import timedelta
 
+
+from decouple import config
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,6 +24,13 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL='accounts.User'
 
 
+# 기존의 STATIC_URL 설정은 유지합니다.
+STATIC_URL = '/static/'
+
+# collectstatic 명령어가 정적 파일을 저장할 디렉토리 경로를 설정합니다.
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -31,13 +43,15 @@ INSTALLED_APPS = [
     'accounts',
     'wish',
     'mypage',
+    'crawler',
     
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'dj_rest_auth',
 
-    'corsheaders'
+    'corsheaders',
+    'storages',
 ]
 
 CORS_ORIGIN_ALLOW_ALL=True
@@ -90,13 +104,47 @@ SIMPLE_JWT = {
 }
 
 
+# 배포 전
+# AWS S3 설정
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
+
+# 환경 구분
+DJANGO_ENV = config('DJANGO_ENV', default='development')
+
+# 스토리지 설정
+if DJANGO_ENV == 'production':
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#이미지 관련 설정
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# #s3 테스트
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+# AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+# AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+# AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
+# MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
+
+
 
 ROOT_URLCONF = 'capstone.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -157,7 +205,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "https://%s/static/" % f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
