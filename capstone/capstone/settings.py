@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'accounts',
     'wish',
     'mypage',
+    'crawler',
     
     'rest_framework',
     'rest_framework_simplejwt',
