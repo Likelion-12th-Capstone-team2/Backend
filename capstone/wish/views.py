@@ -77,7 +77,7 @@ class WishView(views.APIView):
     
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
-      return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
+      return Response({"error": "로그인 후 위시 아이템을 추가할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
     # user_id가 현재 접근하고 있는 유저인지 확인
     if user_id != request.user.id:
