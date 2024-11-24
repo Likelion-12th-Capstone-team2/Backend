@@ -27,7 +27,7 @@ class MypageView(views.APIView):
       serializer.save(user=request.user)
       data = {
         "user": request.user.id,
-        "setting": serializer._data
+        "setting": serializer.data
       }
       return Response(data=data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
