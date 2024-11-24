@@ -117,6 +117,11 @@ class WishItemView(views.APIView):
     page = get_object_or_404(MyPage, user=user_id)
     mypage_serializer = MyPageSerializer(page)
 
+    # sender 정보 -> mypage name으로 수정
+    sender = get_object_or_404(MyPage, user=int(data['sender']))
+    sender_serializer = MyPageSerializer(sender)
+    data['sender'] = sender_serializer.data['name']
+
       
     response_data = {
       'user': user,
@@ -148,7 +153,10 @@ class WishItemView(views.APIView):
       data = dict(wish_items_serializer.data)
       data['category'] = cateogory_serializer.data['category'] 
         
-      
+      # sender 정보 -> mypage name으로 수정
+      sender = get_object_or_404(MyPage, user=int(data['sender']))
+      sender_serializer = MyPageSerializer(sender)
+      data['sender'] = sender_serializer.data['name']
 
       return Response(data=data, status=HTTP_200_OK)
     
