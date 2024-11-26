@@ -59,9 +59,6 @@ class LoginSerializer(serializers.Serializer):
                 }
                 return data      
         else:
-<<<<<<< HEAD
-            raise serializers.ValidationError('존재하지 않는 유저입니다.')  
-=======
             raise serializers.ValidationError('존재하지않는 유저입니다.')  
         
 class KakaoLoginSerializer(serializers.Serializer):
@@ -101,4 +98,3 @@ class KakaoLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(('비밀번호가 필요합니다'))
 
         return data
->>>>>>> b9a6ba0a5a72be8084e4d9e4469e170b6136c50b
