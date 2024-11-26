@@ -206,8 +206,12 @@ class SendView(views.APIView):
     
     if request.user.id == user_id:
       return Response({"error": "자기 자신한테 선물할 수 없습니다."}, status=HTTP_400_BAD_REQUEST)
+    
 
     wishitem = get_object_or_404(Wish, id=item_id)
+
+    if wishitem.is_sended:
+      return Response({"error":"이미 해당 위시 아이템을 선물 받았습니다."}, status=HTTP_400_BAD_REQUEST)
     
     data = {
       'is_sended': True,
