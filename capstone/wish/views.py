@@ -202,6 +202,9 @@ class SendView(views.APIView):
 
     if serializer.is_valid():
       serializer.save()
+
+      # 알람 저장하기
+
       return Response(serializer.data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
