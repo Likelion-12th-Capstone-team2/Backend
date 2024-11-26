@@ -58,8 +58,11 @@ class LoginSerializer(serializers.Serializer):
                     'access_token': access
                 }
                 return data      
+        
         else:
+            
             raise serializers.ValidationError('존재하지않는 유저입니다.')  
+        
         
 class KakaoLoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=128)

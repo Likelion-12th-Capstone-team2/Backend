@@ -13,7 +13,7 @@ class Wish(models.Model):
   # 준 유저 정보
   sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', null=True)
 
-  wish_link = models.CharField(max_length=10000)
+  wish_link = models.URLField(null=True, blank=True)
   item_image = models.ImageField(upload_to='items/')
   item_name = models.CharField(max_length=1000)
   price = models.IntegerField()
