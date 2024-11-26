@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'accounts',
     'wish',
     'mypage',
+    'alarms',
     
     'rest_framework',
     'rest_framework_simplejwt',
