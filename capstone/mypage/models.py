@@ -5,6 +5,10 @@ from accounts.models import User
 
 # 마이페이지 모델
 class MyPage(models.Model):
+
+  name = models.CharField(max_length=50)
+#   background_photo = models.ImageField(upload_to='backgrounds/')
+  background_photo = models.ImageField(upload_to='images/')
   name = models.CharField(max_length=6)
   background_photo = models.ImageField(upload_to='images/')
   color = models.CharField(max_length=100)
