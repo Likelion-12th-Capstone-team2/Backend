@@ -1,30 +1,34 @@
+from dotenv import load_dotenv
 from pathlib import Path
 import os
 from datetime import timedelta
 import json
 import sys
+import environ
+import environ
 
-
-from decouple import config
-
-
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 
+
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
-SECRET_KEY = 'django-insecure-q=!=((=y6#m54!yeqrslu-9c=(hfgya%93v0&li7l8g)n*mtxj'
+DEBUG = env('DEBUG')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-AUTH_USER_MODEL='accounts.User'
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # 기존의 STATIC_URL 설정은 유지합니다.
@@ -43,13 +47,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites', 
+    'django.contrib.sites',
 
     'accounts',
     'wish',
     'mypage',
     'crawler',
-    
+
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -66,11 +70,11 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 2
-#LOGIN_REDIRECT_URL = '/'
+# LOGIN_REDIRECT_URL = '/'
 
-CORS_ORIGIN_ALLOW_ALL=True
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_METHODS = (  #<-실제 요청에 허용되는 HTTP 동사 리스트
+CORS_ALLOW_METHODS = (  # <-실제 요청에 허용되는 HTTP 동사 리스트
     'DELETE',
     'GET',
     'OPTIONS',
@@ -129,17 +133,17 @@ CSRF_TRUSTED_ORIGINS = [
 CSRF_COOKIE_SECURE = False  # 로컬 개발 환경에서만 False로 설정
 SESSION_COOKIE_SECURE = False  # 로컬 개발 환경에서만 False로 설정
 
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None #username 필드 사용 안함
-ACCOUNT_EMAIL_REQUIRED = True # email 필드 사용한다는 뜻
-ACCOUNT_UNIQUE_EMAIL = True #username 필드 사용 안함
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # username 필드 사용 안함
+ACCOUNT_EMAIL_REQUIRED = True  # email 필드 사용한다는 뜻
+ACCOUNT_UNIQUE_EMAIL = True  # username 필드 사용 안함
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-SOCIALACCOUNT_LOGIN_ON_GET = True #중간 클릭 창 뜨지 않고 바로 넘어가게함
-LOGIN_REDIRECT_URL = 'main' #로그인 완료후 연결될 url 설정함 (추후 변경)
-ACCOUNT_LOGOUT_REDIRECT_URL = 'index' #로그아웃 후 연결될 url을 설정함 
-ACCOUNT_LOGOUT_ON_GET = True #로그아웃 요청시 바로 로그아웃 되도록 설정함 
+SOCIALACCOUNT_LOGIN_ON_GET = True  # 중간 클릭 창 뜨지 않고 바로 넘어가게함
+LOGIN_REDIRECT_URL = 'main'  # 로그인 완료후 연결될 url 설정함 (추후 변경)
+ACCOUNT_LOGOUT_REDIRECT_URL = 'index'  # 로그아웃 후 연결될 url을 설정함
+ACCOUNT_LOGOUT_ON_GET = True  # 로그아웃 요청시 바로 로그아웃 되도록 설정함
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -166,13 +170,14 @@ DJANGO_ENV = config('DJANGO_ENV', default='development')
 # 스토리지 설정
 if DJANGO_ENV == 'production':
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
+    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{
+        AWS_S3_REGION_NAME}.amazonaws.com/media/'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#이미지 관련 설정
+# 이미지 관련 설정
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -185,7 +190,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
 # AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
 # MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
-
 
 
 ROOT_URLCONF = 'capstone.urls'
@@ -260,7 +264,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "https://%s/static/" % f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
+STATIC_URL = "https://%s/static/" % f'https://{
+    AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Default primary key field type
@@ -268,6 +273,5 @@ STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-from dotenv import load_dotenv
 load_dotenv()  # .env 파일 로드
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
