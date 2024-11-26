@@ -77,12 +77,17 @@ class WishView(views.APIView):
     
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
-      return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
+      return Response({"error": "로그인 후 위시 아이템을 추가할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
     # user_id가 현재 접근하고 있는 유저인지 확인
     if user_id != request.user.id:
       return Response({"error": "위시 아이템을 추가할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
     
+    category_id = request.data.get('category')
+
+    if not Category.objects.filter(id=category_id, user_id=user_id).exists():
+      return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
+
     serializer = WishPostSerializer(data=request.data)
     if serializer.is_valid():
       serializer.save(user=request.user)
@@ -117,6 +122,12 @@ class WishItemView(views.APIView):
     page = get_object_or_404(MyPage, user=user_id)
     mypage_serializer = MyPageSerializer(page)
 
+    # sender 정보 -> mypage name으로 수정
+    if data['sender']:
+      sender = get_object_or_404(MyPage, user=int(data['sender']))
+      sender_serializer = MyPageSerializer(sender)
+      data['sender'] = sender_serializer.data['name']
+
       
     response_data = {
       'user': user,
@@ -148,7 +159,11 @@ class WishItemView(views.APIView):
       data = dict(wish_items_serializer.data)
       data['category'] = cateogory_serializer.data['category'] 
         
-      
+      # sender 정보 -> mypage name으로 수정
+      if data['sender']:
+        sender = get_object_or_404(MyPage, user=int(data['sender']))
+        sender_serializer = MyPageSerializer(sender)
+        data['sender'] = sender_serializer.data['name']
 
       return Response(data=data, status=HTTP_200_OK)
     
@@ -192,6 +207,9 @@ class SendView(views.APIView):
 
     if serializer.is_valid():
       serializer.save()
+
+      # 알람 저장하기
+
       return Response(serializer.data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 

@@ -27,7 +27,7 @@ class MypageView(views.APIView):
       serializer.save(user=request.user)
       data = {
         "user": request.user.id,
-        "setting": serializer._data
+        "setting": serializer.data
       }
       return Response(data=data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -111,8 +111,8 @@ class CategoryView(views.APIView):
   def patch(self, request, category_id):
         if not request.user.is_authenticated:
             return Response({"error": "로그인 후 카테고리를 수정하세요"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # 해당 카테고리 존재 여부 확인
+
+        # 해당 카테고리 존재 여부 및 유저 권한 확인
         category = Category.objects.filter(user=request.user, id=category_id).first()
         if not category:
             return Response({"error": "카테고리가 존재하지 않음"}, status=status.HTTP_404_NOT_FOUND)
@@ -135,7 +135,7 @@ class CategoryView(views.APIView):
         if not request.user.is_authenticated:
             return Response({"error": "로그인 후 카테고리를 삭제하세요"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 해당 카테고리 존재 여부 확인
+        # 해당 카테고리 존재 여부 및 유저 권한 확인
         category = Category.objects.filter(user=request.user, id=category_id).first()
         if not category:
             return Response({"error": "카테고리가 존재하지 않음"}, status=status.HTTP_404_NOT_FOUND)
