@@ -5,23 +5,16 @@ from datetime import timedelta
 import json
 import sys
 import environ
-<<<<<<< HEAD
 import environ
 
 import pymysql
 pymysql.install_as_MySQLdb()
-=======
->>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
 
-import pymysql  
+import pymysql
 pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-<<<<<<< HEAD
 BASE_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
-=======
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
->>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
 
 env = environ.Env(
     DEBUG=(bool, False)
@@ -38,19 +31,6 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
-<<<<<<< HEAD
-DEBUG = env('DEBUG')
-
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
-AUTH_USER_MODEL = 'accounts.User'
-
-
-# 기존의 STATIC_URL 설정은 유지합니다.
-STATIC_URL = '/static/'
-
-# collectstatic 명령어가 정적 파일을 저장할 디렉토리 경로를 설정합니다.
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-=======
 # SECRET_KEY = 'django-insecure-q=!=((=y6#m54!yeqrslu-9c=(hfgya%93v0&li7l8g)n*mtxj'
 
 # # SECURITY WARNING: don't run with debug turned on in production!
@@ -59,8 +39,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
-AUTH_USER_MODEL='accounts.User'
->>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Application definition
@@ -77,14 +56,10 @@ INSTALLED_APPS = [
     'accounts',
     'wish',
     'mypage',
-<<<<<<< HEAD
+    'alarms',
     'crawler',
     'capstone',
 
-=======
-    'alarms',
-    
->>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -188,26 +163,6 @@ SIMPLE_JWT = {
 }
 
 
-# 배포 전
-# AWS S3 설정
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
-
-# 환경 구분
-DJANGO_ENV = config('DJANGO_ENV', default='development')
-
-# 스토리지 설정
-if DJANGO_ENV == 'production':
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{
-        AWS_S3_REGION_NAME}.amazonaws.com/media/'
-else:
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # 이미지 관련 설정
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -254,8 +209,6 @@ WSGI_APPLICATION = 'capstone.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -290,18 +243,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-<<<<<<< HEAD
-STATIC_URL = "https://%s/static/" % f'https://{
-    AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-=======
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
->>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -310,3 +257,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 load_dotenv()  # .env 파일 로드
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
+        "OPTIONS": {"charset": "utf8mb4"},
+    }
+}

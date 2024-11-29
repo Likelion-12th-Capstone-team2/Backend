@@ -1,9 +1,9 @@
 version: '3'
 services:
 
-  db:
+  capstone:  # db를 capstone으로 변경
     platform: linux/amd64
-    container_name: db
+    container_name: capstone
     image: mysql:8.0
     restart: always
     environment:
@@ -28,7 +28,7 @@ services:
       DATABASE_USER: 'root'
       DATABASE_PASSWORD: root1234
       DATABASE_PORT: 3306
-      DATABASE_HOST: db
+      DATABASE_HOST: capstone  # db를 capstone으로 변경
       DJANGO_SETTINGS_MODULE: capstone.settings.dev
     restart: always
     ports:
@@ -36,7 +36,10 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - db
+      - capstone  # db를 capstone으로 변경
+
 volumes:
   app:
   dbdata:
+
+# "00"
