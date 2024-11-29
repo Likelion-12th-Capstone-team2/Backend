@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'wish',
     'mypage',
     'crawler',
+    'capstone',
 
     'rest_framework',
     'rest_framework_simplejwt',
