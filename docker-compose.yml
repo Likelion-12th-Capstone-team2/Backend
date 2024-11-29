@@ -42,4 +42,3 @@ volumes:
   app:
   dbdata:
 
-# "00"
