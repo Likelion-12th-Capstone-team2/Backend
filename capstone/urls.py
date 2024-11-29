@@ -9,5 +9,11 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('mypages/', include('mypage.urls')),
     path('wish/', include('wish.urls')),
+<<<<<<< HEAD
     path('crawler/', include('crawler.urls')),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+=======
+    path('alarms/', include('alarms.urls')),
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+
+>>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc

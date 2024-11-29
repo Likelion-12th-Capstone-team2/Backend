@@ -1,6 +1,10 @@
 from .base import *  # noqa
 
 DEBUG = True
+<<<<<<< HEAD
+=======
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+>>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
 
 DATABASES = {
     'default': {
