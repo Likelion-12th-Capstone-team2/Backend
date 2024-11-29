@@ -5,15 +5,28 @@ from datetime import timedelta
 import json
 import sys
 import environ
+<<<<<<< HEAD
 import environ
 
 import pymysql
 pymysql.install_as_MySQLdb()
+=======
+>>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
 
+import pymysql  
+pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+<<<<<<< HEAD
 BASE_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
+=======
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+>>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
 
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 env = environ.Env(
     DEBUG=(bool, False)
@@ -25,6 +38,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
+<<<<<<< HEAD
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
@@ -36,6 +50,17 @@ STATIC_URL = '/static/'
 
 # collectstatic 명령어가 정적 파일을 저장할 디렉토리 경로를 설정합니다.
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+=======
+# SECRET_KEY = 'django-insecure-q=!=((=y6#m54!yeqrslu-9c=(hfgya%93v0&li7l8g)n*mtxj'
+
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+SECRET_KEY = env('DJANGO_SECRET_KEY')
+DEBUG = env('DEBUG')
+
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+AUTH_USER_MODEL='accounts.User'
+>>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
 
 
 # Application definition
@@ -52,9 +77,14 @@ INSTALLED_APPS = [
     'accounts',
     'wish',
     'mypage',
+<<<<<<< HEAD
     'crawler',
     'capstone',
 
+=======
+    'alarms',
+    
+>>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -223,12 +253,7 @@ WSGI_APPLICATION = 'capstone.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+
 
 
 # Password validation
@@ -253,9 +278,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-KR'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -265,9 +290,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+<<<<<<< HEAD
 STATIC_URL = "https://%s/static/" % f'https://{
     AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+=======
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+>>>>>>> 84fc09e359782ed2e2ad81cc518ecf46d659acdc
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
