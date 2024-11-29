@@ -5,6 +5,10 @@ from datetime import timedelta
 import json
 import sys
 import environ
+import environ
+
+import pymysql
+pymysql.install_as_MySQLdb()
 
 import pymysql
 pymysql.install_as_MySQLdb()
@@ -17,10 +21,15 @@ env = environ.Env(
 )
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECRET_KEY = 'django-insecure-q=!=((=y6#m54!yeqrslu-9c=(hfgya%93v0&li7l8g)n*mtxj'
 
@@ -48,6 +57,8 @@ INSTALLED_APPS = [
     'wish',
     'mypage',
     'alarms',
+    'crawler',
+    'capstone',
 
     'rest_framework',
     'rest_framework_simplejwt',
@@ -60,7 +71,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
 
-    'corsheaders'
+    'corsheaders',
+    'storages',
 ]
 
 SITE_ID = 2
@@ -119,6 +131,14 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',  # 로컬 개발 환경
+    # 'https://yourdomain.com',  # 배포 도메인 추가
+]
+
+CSRF_COOKIE_SECURE = False  # 로컬 개발 환경에서만 False로 설정
+SESSION_COOKIE_SECURE = False  # 로컬 개발 환경에서만 False로 설정
+
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # username 필드 사용 안함
 ACCOUNT_EMAIL_REQUIRED = True  # email 필드 사용한다는 뜻
 ACCOUNT_UNIQUE_EMAIL = True  # username 필드 사용 안함
@@ -148,6 +168,16 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+# #s3 테스트
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+# AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+# AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+# AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
+# MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/media/'
+
+
 ROOT_URLCONF = 'capstone.urls'
 
 AUTHENTICATION_BACKENDS = [
@@ -159,7 +189,7 @@ AUTHENTICATION_BACKENDS = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
