@@ -12,3 +12,6 @@ urlpatterns = [
     path('alarms/', include('alarms.urls')),
     path('crawler/', include('crawler.urls')),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+
+
+# "99"
