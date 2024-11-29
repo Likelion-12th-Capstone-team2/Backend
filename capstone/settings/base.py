@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 from pathlib import Path
 import os
 from datetime import timedelta
@@ -5,10 +6,11 @@ import json
 import sys
 import environ
 
-import pymysql  
+import pymysql
 pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 
 env = environ.Env(
     DEBUG=(bool, False)
@@ -28,7 +30,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
-AUTH_USER_MODEL='accounts.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Application definition
@@ -40,13 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites', 
+    'django.contrib.sites',
 
     'accounts',
     'wish',
     'mypage',
     'alarms',
-    
+
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -62,11 +64,11 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 2
-#LOGIN_REDIRECT_URL = '/'
+# LOGIN_REDIRECT_URL = '/'
 
-CORS_ORIGIN_ALLOW_ALL=True
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_METHODS = (  #<-실제 요청에 허용되는 HTTP 동사 리스트
+CORS_ALLOW_METHODS = (  # <-실제 요청에 허용되는 HTTP 동사 리스트
     'DELETE',
     'GET',
     'OPTIONS',
@@ -117,17 +119,17 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None #username 필드 사용 안함
-ACCOUNT_EMAIL_REQUIRED = True # email 필드 사용한다는 뜻
-ACCOUNT_UNIQUE_EMAIL = True #username 필드 사용 안함
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # username 필드 사용 안함
+ACCOUNT_EMAIL_REQUIRED = True  # email 필드 사용한다는 뜻
+ACCOUNT_UNIQUE_EMAIL = True  # username 필드 사용 안함
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-SOCIALACCOUNT_LOGIN_ON_GET = True #중간 클릭 창 뜨지 않고 바로 넘어가게함
-LOGIN_REDIRECT_URL = 'main' #로그인 완료후 연결될 url 설정함 (추후 변경)
-ACCOUNT_LOGOUT_REDIRECT_URL = 'index' #로그아웃 후 연결될 url을 설정함 
-ACCOUNT_LOGOUT_ON_GET = True #로그아웃 요청시 바로 로그아웃 되도록 설정함 
+SOCIALACCOUNT_LOGIN_ON_GET = True  # 중간 클릭 창 뜨지 않고 바로 넘어가게함
+LOGIN_REDIRECT_URL = 'main'  # 로그인 완료후 연결될 url 설정함 (추후 변경)
+ACCOUNT_LOGOUT_REDIRECT_URL = 'index'  # 로그아웃 후 연결될 url을 설정함
+ACCOUNT_LOGOUT_ON_GET = True  # 로그아웃 요청시 바로 로그아웃 되도록 설정함
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -141,7 +143,7 @@ SIMPLE_JWT = {
 }
 
 
-#이미지 관련 설정
+# 이미지 관련 설정
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -175,8 +177,6 @@ WSGI_APPLICATION = 'capstone.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-
 
 
 # Password validation
@@ -225,6 +225,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-from dotenv import load_dotenv
 load_dotenv()  # .env 파일 로드
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+        'PORT': env('DATABASE_PORT'),
+        "OPTIONS": {"charset": "utf8mb4"},
+    }
+}
