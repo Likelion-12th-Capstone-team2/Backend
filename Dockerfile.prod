@@ -19,10 +19,12 @@ RUN apk update && apk add --no-cache \
     libffi-dev \
     linux-headers \
     jpeg-dev \
-    zlib-dev
+    zlib-dev \
+    pkgconfig
 
 # pip 및 빌드 도구 업그레이드
 RUN python3 -m pip install --upgrade pip setuptools wheel
+
 # `maturin` 명시적 설치
 RUN python3 -m pip install maturin==1.0.0
 
