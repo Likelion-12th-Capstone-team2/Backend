@@ -2,7 +2,7 @@
 # BUILDER #
 ###########
 
-FROM python:3.8.3-alpine
+FROM python:3.8.3-alpine as builder
 
 WORKDIR /usr/src/app
 
@@ -20,8 +20,8 @@ RUN apk update && apk add --no-cache \
     linux-headers \
     jpeg-dev \
     zlib-dev \
-    pkgconfig \
-    mariadb-dev
+    mysql-dev \
+    pkgconfig
 
 # pip 및 빌드 도구 업그레이드
 RUN python3 -m pip install --upgrade pip setuptools wheel maturin
@@ -41,7 +41,7 @@ WORKDIR /usr/src/app
 # 런타임 의존성 설치
 RUN apk update && apk add --no-cache \
     libffi \
-    mariadb-connector-c-dev \
+    libmysqlclient-dev \
     tzdata \
     jpeg-dev \
     zlib-dev
