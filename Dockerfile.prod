@@ -13,11 +13,11 @@ ENV PYTHONUNBUFFERED 1
 RUN apk update && apk add --no-cache \
     python3 \
     python3-dev \
-~    build-base \
-~    rust \
-~    cargo \
-~    libffi-dev \
-~    linux-headers \
+    build-base \
+    rust \
+    cargo \
+    libffi-dev \
+    linux-headers \
     jpeg-dev \
     zlib-dev
 
@@ -39,16 +39,16 @@ FROM python:3.8.3-alpine
 WORKDIR /usr/src/app
 
 # 런타임 의존성 설치
-~RUN apk update && apk add --no-cache \
-~    libffi \
-~    mariadb-dev \
-~    tzdata \
-~    jpeg-dev \
-~    zlib-dev
-~
-~# pip 업그레이드
-~RUN python3 -m pip install --upgrade pip
-~
+RUN apk update && apk add --no-cache \
+    libffi \
+    mariadb-dev \
+    tzdata \
+    jpeg-dev \
+    zlib-dev
+
+# pip 업그레이드
+RUN python3 -m pip install --upgrade pip
+
 # Python 의존성 설치
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
@@ -62,12 +62,12 @@ ENV TZ=Asia/Seoul
 COPY . /usr/src/app/
 COPY ./config/docker/entrypoint.prod.sh /usr/src/app/
 
-~# 애플리케이션 실행 사용자 설정
-~RUN addgroup -S app && adduser -S app -G app
-~RUN chown -R app:app /usr/src/app/
-~
-~# 빌드 패키지 삭제
-~RUN apk del build-base rust cargo linux-headers
-~
-~# 사용자 전환
-~USER app
+# 애플리케이션 실행 사용자 설정
+RUN addgroup -S app && adduser -S app -G app
+RUN chown -R app:app /usr/src/app/
+
+# 빌드 패키지 삭제
+RUN apk del build-base rust cargo linux-headers
+
+# 사용자 전환
+USER app
