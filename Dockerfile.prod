@@ -25,9 +25,10 @@ RUN apk update && apk add --no-cache \
 
 # dependencies for pillow
 RUN apk add --no-cache jpeg-dev zlib-dev
+RUN apk add --no-cache rust cargo
 
 # pip 업그레이드
-RUN python3 -m pip install --upgrade pip
+RUN python3 -m pip install --upgrade pip setuptools wheel maturin
 
 # install dependencies
 COPY ./requirements.txt .
