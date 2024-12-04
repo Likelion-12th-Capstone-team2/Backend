@@ -28,7 +28,9 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ubuntu
         key: ${{ secrets.KEY }}
-        script: bash -c mkdir -p /home/ubuntu/srv/ubuntu
+        script: |
+          sudo chsh -s /bin/bash ubuntu
+          bash -c "mkdir -p /home/ubuntu/srv/ubuntu"
 
     - name: copy source via ssh key
       uses: burnett01/rsync-deployments@4.1
