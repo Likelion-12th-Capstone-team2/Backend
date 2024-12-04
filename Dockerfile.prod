@@ -30,6 +30,13 @@ RUN apk update && apk add --no-cache \
 RUN python3 -m pip install --upgrade pip setuptools wheel
 RUN python3 -m pip install maturin==1.0.0
 
+# dependencies for pandas
+RUN apk update && apk add --no-cache \
+    gcc \
+    g++ \
+    cusl-dev
+
+RUN pip install numpy==1.23.5
 
 # install dependencies
 COPY ./requirements.txt .
