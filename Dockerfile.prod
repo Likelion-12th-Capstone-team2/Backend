@@ -35,6 +35,8 @@ RUN apk update && apk add --no-cache \
     gcc \
     g++ \
     openblas-dev \
+    libxml2-dev \
+    libxslt-dev \
     musl-dev
 
 RUN python3 -m pip install numpy==1.23.5
