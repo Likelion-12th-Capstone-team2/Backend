@@ -17,10 +17,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    # GitHub 리포지토리를 체크아웃
+# GitHub 리포지토리를 체크아웃
     - name: checkout
       uses: actions/checkout@master
-	
 # Action Secret에 설정한 ENV_VARS 값을 .env 파일로 만듦
     - name: create env file
       run: |
