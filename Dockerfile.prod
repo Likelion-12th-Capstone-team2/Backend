@@ -1,75 +1,73 @@
-###########
 # BUILDER #
 ###########
 
+# pull official base image
 FROM python:3.8.3-alpine as builder
 
+# set work directory
 WORKDIR /usr/src/app
 
+
+# set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# 필수 패키지 설치
-RUN apk update && apk add --no-cache \
-    python3 \
-    python3-dev \
-    build-base \
-    rust \
-    cargo \
-    libffi-dev \
-    linux-headers \
-    jpeg-dev \
-    zlib-dev \
-    pkgconfig
+# install psycopg2 dependencies
+RUN apk update && apk add python3 python3-dev mariadb-dev build-base && pip3 install mysqlclient
 
-# pip 및 빌드 도구 업그레이드
-RUN python3 -m pip install --upgrade pip setuptools wheel
+# dependencies for pillow
+RUN apk add --no-cache jpeg-dev zlib-dev
+RUN apk add --no-cache --virtual .build-deps build-base linux-headers
 
-# `maturin` 명시적 설치
-RUN python3 -m pip install maturin==1.0.0
-
-# Python 의존성 설치
+# install dependencies
 COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
-###########
-# FINAL #
-###########
 
+#########
+# FINAL #
+#########
+
+# pull official base image
 FROM python:3.8.3-alpine
 
-WORKDIR /usr/src/app
+# create directory for the app user
+RUN mkdir -p /home/app
 
-# 런타임 의존성 설치
-RUN apk update && apk add --no-cache \
-    libffi \
-    mariadb-dev \
-    tzdata \
-    jpeg-dev \
-    zlib-dev
+# create the app user
+RUN addgroup -S app && adduser -S app -G app
 
-# pip 업그레이드
-RUN python3 -m pip install --upgrade pip
+# create the appropriate directories
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/static
+RUN mkdir $APP_HOME/media
+WORKDIR $APP_HOME
 
-# Python 의존성 설치
+# install dependencies
+RUN apk update && apk add libpq tzdata
+RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+RUN apk update \
+    && apk add --virtual build-deps gcc python3-dev musl-dev \
+    && apk add --no-cache jpeg-dev zlib-dev mariadb-dev
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
-RUN pip install --no-cache-dir /wheels/*
+RUN pip install mysqlclient
+RUN pip install --no-cache /wheels/*
+RUN apk del build-deps
 
-# 타임존 설정
-RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && echo "Asia/Seoul" > /etc/timezone
+# set timezone
 ENV TZ=Asia/Seoul
 
-# 프로젝트 복사
-COPY . /usr/src/app/
-COPY ./config/docker/entrypoint.prod.sh /usr/src/app/
+# copy entrypoint-prod.sh
+COPY ./config/docker/entrypoint.prod.sh $APP_HOME
 
-# 애플리케이션 실행 사용자 설정
-RUN addgroup -S app && adduser -S app -G app
-RUN chown -R app:app /usr/src/app/
+# copy project
+COPY . $APP_HOME
 
-# 빌드 패키지 삭제
-RUN apk del build-base rust cargo linux-headers
+# chown all the files to the app user
+RUN chown -R app:app $APP_HOME
 
-# 사용자 전환
+# change to the app user
 USER app
