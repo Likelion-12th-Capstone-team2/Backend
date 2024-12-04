@@ -21,6 +21,9 @@ jobs:
       run: |
         touch .env
         echo "${{ secrets.ENV_VARS }}" >> .env
+
+    - name: Clean Disk Space
+      run: docker system prune -af --volumes
   
     - name: create remote directory
       uses: appleboy/ssh-action@v0.1.4
@@ -45,5 +48,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ubuntu
         key: ${{ secrets.KEY }}
+        timeout: 1200
         script: |
           sh /home/ubuntu/srv/ubuntu/config/scripts/deploy.sh
