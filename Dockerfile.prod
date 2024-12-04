@@ -34,6 +34,7 @@ RUN python3 -m pip install maturin==1.0.0
 RUN apk update && apk add --no-cache \
     gcc \
     g++ \
+    openblas-dev \
     musl-dev
 
 # install dependencies
