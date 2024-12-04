@@ -45,6 +45,5 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ubuntu
         key: ${{ secrets.KEY }}
-        timeout: 1200
         script: |
           sh /home/ubuntu/srv/ubuntu/config/scripts/deploy.sh
