@@ -37,6 +37,8 @@ RUN apk update && apk add --no-cache \
     openblas-dev \
     musl-dev
 
+RUN python3 -m pip install numpy==1.23.5
+
 # install dependencies
 COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
