@@ -44,8 +44,7 @@ RUN python3 -m pip install numpy==1.23.5
 
 # install dependencies
 COPY ./requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
-
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt --progress-bar off --use-feature=fast-deps
 
 
 #########
