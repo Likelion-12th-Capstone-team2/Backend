@@ -27,7 +27,8 @@ RUN apk update && apk add --no-cache \
     libffi-dev \
     pkgconfig
 
-RUN python3 -m pip install --upgrade pip setuptools wheel
+RUN python3 -m pip install --upgrade pip wheel
+RUN python3 -m pip install setuptools==59.8.0
 RUN python3 -m pip install maturin==1.0.0
 
 # dependencies for pandas
