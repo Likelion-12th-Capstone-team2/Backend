@@ -25,6 +25,7 @@ RUN apk update && apk add --no-cache \
     rust \
     cargo \
     libffi-dev \
+    openssl-dev \
     pkgconfig
 
 RUN python3 -m pip install --upgrade pip wheel
