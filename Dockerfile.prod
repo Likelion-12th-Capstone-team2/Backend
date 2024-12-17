@@ -15,8 +15,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     gcc \
     cargo \
-    rustc \
-    && rm -rf /var/lib/apt/lists/*  # 캐시 제거로 이미지 크기 줄이기
+    rustc
 
 # pip, setuptools, wheel 업데이트
 RUN python -m pip install --upgrade pip setuptools wheel
