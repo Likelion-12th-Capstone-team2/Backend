@@ -2,7 +2,7 @@
 ###########
 
 # pull official base image
-FROM python:3.8.3-slim as builder
+FROM python:3.8.3-slim
 
 # set work directory
 WORKDIR /usr/src/app
@@ -35,12 +35,6 @@ RUN python3 -m pip install --no-binary cryptography cryptography==3.4.8
 COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt --progress-bar off --use-feature=fast-deps
 
-#########
-# FINAL #
-#########
-
-# pull official base image
-FROM python:3.8.3-slim
 
 # create directory for the app user
 RUN mkdir -p /home/app
