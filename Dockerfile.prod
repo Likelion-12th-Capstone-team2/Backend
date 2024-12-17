@@ -31,7 +31,6 @@ RUN apk update && apk add --no-cache \
 RUN python3 -m pip install --upgrade pip wheel
 RUN python3 -m pip install setuptools==59.8.0
 RUN python3 -m pip install maturin==1.0.0
-RUN python3 -m pip install --no-binary cryptography cryptography==3.4.8
 
 
 # dependencies for pandas
