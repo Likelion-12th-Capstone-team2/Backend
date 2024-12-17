@@ -25,10 +25,10 @@ tzdata==2024.2
 urllib3==1.26.6
 django-storages==1.14.0
 # 웹 크롤링 관련 패키지
-requests==2.32.3
-beautifulsoup4==4.12.2
-lxml==4.9.3
-pandas==2.0.3
+# requests==2.32.3
+# beautifulsoup4==4.12.2
+# lxml==4.9.3
+# pandas==2.0.3
 
 # S3 스토리지 관련 패키지
 django-storages==1.14.0
