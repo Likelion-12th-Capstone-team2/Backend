@@ -25,6 +25,8 @@ RUN apk update && apk add --no-cache \
     rust \
     cargo \
     libffi-dev \
+    build-essential \
+    libssl-dev \
     openssl-dev \
     pkgconfig
 
