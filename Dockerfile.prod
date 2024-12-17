@@ -1,40 +1,86 @@
-FROM python:3.8.3-slim
+# BUILDER #
+###########
 
-# 작업 디렉토리 생성
-WORKDIR /app
+# pull official base image
+FROM python:3.8.3-slim as builder
 
-# 필요한 시스템 패키지 설치
+# set work directory
+WORKDIR /usr/src/app
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install dependencies for mysqlclient and pillow
 RUN apt-get update && apt-get install -y \
-    mariadb-client \
-    libmariadb-dev \
+    default-libmysqlclient-dev build-essential \
+    libjpeg-dev zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# cryptography dependencies
+RUN apt-get update && apt-get install -y \
     build-essential \
     libssl-dev \
     libffi-dev \
-    python3-dev \
-    libjpeg-dev \
-    zlib1g-dev \
-    gcc \
     cargo \
-    rustc
+    rustc \
+    && rm -rf /var/lib/apt/lists/*
 
-# pip, setuptools, wheel 업데이트
-RUN python -m pip install --upgrade pip setuptools wheel
-RUN pip install maturin
+RUN python3 -m pip install --upgrade pip wheel
+RUN python3 -m pip install setuptools==59.8.0
+RUN python3 -m pip install maturin==1.0.0
+RUN python3 -m pip install --no-binary cryptography cryptography==3.4.8
 
-# CRYPTOGRAPHY_DONT_BUILD_RUST 환경변수 설정 (Rust 빌드를 건너뛰기)
-ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+# install dependencies
+COPY ./requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt --progress-bar off --use-feature=fast-deps
 
-# requirements.txt 복사
-COPY requirements.txt /app/
+#########
+# FINAL #
+#########
 
-# charset-normalizer를 소스에서 설치
-RUN pip install --no-binary :all: charset-normalizer==3.3.2
+# pull official base image
+FROM python:3.8.3-slim
 
-# 나머지 패키지 설치
-RUN pip install --no-cache-dir -r requirements.txt
+# create directory for the app user
+RUN mkdir -p /home/app
 
-# 애플리케이션 소스 복사
-COPY . /app
+# create the app user
+RUN addgroup --system app && adduser --system --group app
 
-# 실행 명령
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# create the appropriate directories
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/static
+RUN mkdir $APP_HOME/media
+WORKDIR $APP_HOME
+
+# install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libmysqlclient-dev \
+    libjpeg62-turbo-dev \
+    zlib1g-dev \
+    tzdata \
+    && ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/src/app/wheels /wheels
+COPY --from=builder /usr/src/app/requirements.txt .
+RUN pip install mysqlclient
+RUN pip install --no-cache /wheels/*
+
+# set timezone
+ENV TZ=Asia/Seoul
+
+# copy entrypoint-prod.sh
+COPY ./config/docker/entrypoint.prod.sh $APP_HOME
+
+# copy project
+COPY . $APP_HOME
+
+# chown all the files to the app user
+RUN chown -R app:app $APP_HOME
+
+# change to the app user
+USER app
