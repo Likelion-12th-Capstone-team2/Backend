@@ -37,3 +37,7 @@ boto3==1.26.0
 # 추가 설정 및 환경 관리
 django-environ==0.11.2
 botocore==1.29.0
+
+# 크롤링 코드
+selenium==4.27.1
+webdriver-manager==4.0.2
