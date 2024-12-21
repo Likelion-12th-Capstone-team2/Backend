@@ -33,6 +33,8 @@ class LoginView(views.APIView):
 # 환경 변수 로드 (옵션: .env 파일을 사용)
 load_dotenv()
 
+
+
 KAKAO_CLIENT_ID = os.environ.get('KAKAO_CLIENT_ID')
 KAKAO_PASSWORD = os.environ.get('KAKAO_PASSWORD')
 KAKAO_CLIENT_SECRET_KEY = os.environ.get('KAKAO_CLIENT_SECRET_KEY')
