@@ -6,7 +6,9 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'capstone.settings.base')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'capstone.settings')
+    # 로컬에서 수정할 경우 아래 옵션으로 변경
+    # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'capstone.settings.base')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
