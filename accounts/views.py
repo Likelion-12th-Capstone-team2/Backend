@@ -18,17 +18,18 @@ class SignupView(views.APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message':'회원가입 성공!', 'data':serializer.data})
-        return Response({'messange':'회원가입 실패!', 'error':serializer.errors})
-    
-class LoginView(views.APIView):
-    serializer_class= LoginSerializer
-    def post(self, request):
-        serializer = LoginSerializer(data = request.data)
+            return Response({'message': '회원가입 성공!', 'data': serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({'message': '회원가입 실패!', 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class LoginView(views.APIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            return Response({'message':'로그인 성공!', 'data':serializer.validated_data})
-        return Response({'message':'로그인 실패!', 'error':serializer.errors})
+            return Response({'message': '로그인 성공!', 'data': serializer.validated_data}, status=status.HTTP_200_OK)
+        return Response({'message': '로그인 실패!', 'error': serializer.errors}, status=status.HTTP_401_UNAUTHORIZED)
 
 # 환경 변수 로드 (옵션: .env 파일을 사용)
 load_dotenv()

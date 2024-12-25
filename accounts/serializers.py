@@ -42,7 +42,7 @@ class LoginSerializer(serializers.Serializer):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                raise serializers.ValidationError('사용자가 존재하지 않습니다.')
+                raise serializers.ValidationError('사용자가 존재하지 않습니다.(등록된 이메일이 없음)')
     
             if not user.check_password(password):
                 raise serializers.ValidationError('잘못된 비밀번호입니다.')
@@ -61,7 +61,7 @@ class LoginSerializer(serializers.Serializer):
         
         else:
             
-            raise serializers.ValidationError('존재하지않는 유저입니다.')  
+            raise serializers.ValidationError('사용자가 존재하지 않습니다.(등록된 이메일이 없음)')  
         
         
 class KakaoLoginSerializer(serializers.Serializer):
