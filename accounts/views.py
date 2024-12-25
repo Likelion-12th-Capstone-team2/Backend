@@ -21,16 +21,27 @@ class SignupView(views.APIView):
             serializer.save()
             return Response({'message': '회원가입 성공!', 'data': serializer.data}, status=status.HTTP_201_CREATED)
         
-        # validation error 처리 시 status와 message 포함
+                # validation error 처리 시 status와 message 포함
         formatted_errors = []
         for field, error_list in serializer.errors.items():
-            for error in error_list:
-                formatted_errors.append({
-                    'status': 400,  # 원하는 상태 코드 설정
-                    'field': field,
-                    'message': error
-                })
-
+            if field:  # 필드가 있을 경우
+                for error in error_list:
+                    # 이메일 중복일 때는 401, 다른 필드 문제는 400으로 처리
+                    if '이미 존재합니다' in error:
+                        status_code = 401  # 중복 필드는 401
+                    else:
+                        status_code = 400  # 그 외에는 400
+                    formatted_errors.append({
+                        'status': status_code,
+                        'field': field,
+                        'message': error
+                    })
+            else:  # 필드가 없을 경우
+                for error in error_list:
+                    formatted_errors.append({
+                        'status': 400,  # 필드가 없을 경우는 400
+                        'message': error
+                    })
         return Response({'message': '회원가입 실패!', 'errors': formatted_errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
