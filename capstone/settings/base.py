@@ -273,3 +273,5 @@ DATABASES = {
         "OPTIONS": {"charset": "utf8mb4"},
     }
 }
+
+
