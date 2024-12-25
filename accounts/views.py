@@ -26,10 +26,14 @@ class LoginView(views.APIView):
     serializer_class = LoginSerializer
 
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            return Response({'message': '로그인 성공!', 'data': serializer.validated_data}, status=status.HTTP_200_OK)
-        return Response({'message': '로그인 실패!', 'error': serializer.errors}, status=status.HTTP_401_UNAUTHORIZED)
+        serializer = self.serializer_class(data=request.data)
+        try:
+            if serializer.is_valid(raise_exception=True):
+                return Response({'message': '로그인 성공!', 'data': serializer.validated_data}, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            return Response({'message': '로그인 실패!', 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except AuthenticationFailed as e:
+            return Response({'message': '로그인 실패!', 'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
 # 환경 변수 로드 (옵션: .env 파일을 사용)
 load_dotenv()
