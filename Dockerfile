@@ -58,7 +58,7 @@ RUN apk update && apk add --no-cache \
     libgconf-2-4 \
     dbus
 
-RUN chromium-browser --version && chromedriver --version
+
 
 # Rust 설치
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -77,5 +77,7 @@ COPY . /app/
 # 환경 변수 추가
 ENV CHROME_BIN=/usr/bin/chromium-browser
 ENV CHROMEDRIVER_BIN=/usr/bin/chromedriver
+
+RUN chromium-browser --version && chromedriver --version
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
