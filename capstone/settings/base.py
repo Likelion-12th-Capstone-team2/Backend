@@ -271,6 +271,7 @@ DATABASES = {
         'HOST': env('DATABASE_HOST'),
         'PORT': env('DATABASE_PORT'),
         "OPTIONS": {"charset": "utf8mb4"},
+        "auth_plugin": "mysql_native_password",  # 인증 플러그인 설정 추가, cryptography 안쓰도록...
     }
 }
 
