@@ -74,7 +74,7 @@ RUN apk del build-base python3-dev
 # 애플리케이션 코드 복사
 COPY . /app/
 
-# 환경 변수 추가
+# 환경 변수 추가아..
 ENV CHROME_BIN=/usr/bin/chromium-browser
 ENV CHROMEDRIVER_BIN=/usr/bin/chromedriver
 
