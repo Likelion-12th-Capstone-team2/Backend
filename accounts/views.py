@@ -20,7 +20,18 @@ class SignupView(views.APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({'message': '회원가입 성공!', 'data': serializer.data}, status=status.HTTP_201_CREATED)
-        return Response({'message': '회원가입 실패!', 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # validation error 처리 시 status와 message 포함
+        formatted_errors = []
+        for field, error_list in serializer.errors.items():
+            for error in error_list:
+                formatted_errors.append({
+                    'status': 400,  # 원하는 상태 코드 설정
+                    'field': field,
+                    'message': error
+                })
+
+        return Response({'message': '회원가입 실패!', 'errors': formatted_errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(views.APIView):
