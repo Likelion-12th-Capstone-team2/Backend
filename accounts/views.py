@@ -42,6 +42,13 @@ class SignupView(views.APIView):
                         'status': 400,  # 필드가 없을 경우는 400
                         'message': error
                     })
+
+        # status 값을 formatted_errors에서 받아와서 응답 반환
+        if formatted_errors:
+            # 첫 번째 error에서 status를 가져와서 전체 응답 상태 코드 설정
+            response_status = formatted_errors[0]['status']
+            return Response({'message': '회원가입 실패!', 'errors': formatted_errors}, status=response_status)
+        
         return Response({'message': '회원가입 실패!', 'errors': formatted_errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
