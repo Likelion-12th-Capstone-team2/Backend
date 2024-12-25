@@ -58,6 +58,8 @@ RUN apk update && apk add --no-cache \
     libgconf-2-4 \
     dbus
 
+RUN chromium-browser --version && chromedriver --version
+
 # Rust 설치
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:$PATH"
