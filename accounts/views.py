@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv
 import requests
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 
 # Create your views here.
 

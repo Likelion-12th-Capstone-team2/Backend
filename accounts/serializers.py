@@ -11,6 +11,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'password']
     
     def create(self, validated_data):
+        # 이메일 중복 확인
+        if User.objects.filter(email=validated_data['email']).exists():
+            raise serializers.ValidationError({
+                'status': 401,
+                'message': '이미 사용 중인 이메일입니다.'
+            })
+        
+        # 중복되지 않으면 유저 생성
         user = User.objects.create(
             email=validated_data['email'],
         )
@@ -39,13 +47,13 @@ class LoginSerializer(serializers.Serializer):
         if not email or not password:
             raise ValidationError("필수 필드를 모두 입력해주세요.", code=400)
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            raise AuthenticationFailed('사용자가 존재하지 않습니다. (등록된 이메일 없음)', code=401)
+        if not User.objects.filter(email=email).exists():
+            raise ValidationError("사용자가 존재하지 않습니다. (등록된 이메일 없음)", code=400)
+
+        user = User.objects.get(email=email)
 
         if not user.check_password(password):
-            raise AuthenticationFailed('잘못된 비밀번호입니다.', code=401)
+            raise AuthenticationFailed("잘못된 비밀번호입니다.", code=401)
 
         token = RefreshToken.for_user(user)
         refresh = str(token)
@@ -55,7 +63,7 @@ class LoginSerializer(serializers.Serializer):
             'id': user.id,
             'username': user.username,
             'access_token': access
-        }   
+        }
         
         
 class KakaoLoginSerializer(serializers.Serializer):
