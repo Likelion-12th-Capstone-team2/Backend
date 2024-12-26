@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
 from PIL import Image
+import io
 # 로거 생성
 logger = logging.getLogger('django')
 class WishView(views.APIView):
