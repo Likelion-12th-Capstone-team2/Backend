@@ -265,8 +265,8 @@ class WishItemView(views.APIView):
           else:
             return Response({"error": "item_image 또는 유효한 이미지 URL을 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
 
-      patch_serializer = WishPostSerializer(wishitem, data=data, partial=True)
-      if patch_serializer.is_valid():
+    patch_serializer = WishPostSerializer(wishitem, data=data, partial=True)
+    if patch_serializer.is_valid():
         patch_serializer.save()
       
         data['category'] = cateogory_serializer.data['category'] 
@@ -286,11 +286,9 @@ class WishItemView(views.APIView):
           logger.debug("No sender provided")
         
           return Response(data=data, status=HTTP_200_OK)
-      else:
+    else:
         return Response({"error": patch_serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
-    else:
-      return Response({"error": wish_items_serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
   def delete(self, request, item_id):
     # 로그인을 안한 경우 400 오류
