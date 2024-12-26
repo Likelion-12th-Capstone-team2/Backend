@@ -228,7 +228,7 @@ class WishItemView(views.APIView):
       cateogory_serializer = CategorySerializer(cateogory)
 
       # 데이터를 새로 구성
-      data = dict(wish_items_serializer.data)
+      data = dict(request.data)
 
       # 이미지 유무에 따른 데이터 변환
       if 'item_image' in data and data['item_image']:
@@ -267,25 +267,30 @@ class WishItemView(views.APIView):
           else:
             return Response({"error": "item_image 또는 유효한 이미지 URL을 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
 
-
-      data['category'] = cateogory_serializer.data['category'] 
+      patch_serializer = WishPostSerializer(wishitem, data=data, partial=True)
+      if patch_serializer.is_valid():
+        patch_serializer.save()
+      
+        data['category'] = cateogory_serializer.data['category'] 
+          
+        # sender 정보 -> mypage name으로 수정
+        if 'sender' in data and data['sender']:
+          logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
+          try:
+              sender = get_object_or_404(MyPage, user=int(data['sender']))
+              sender_serializer = MyPageSerializer(sender)
+              data['sender'] = sender_serializer.data['name']
+              logger.debug(f"Sender found: {data['sender']}")
+          except Http404:
+              logger.warning(f"MyPage not found for sender: {data['sender']}. Using user_id as fallback.")
+              data['sender'] = user_id  # MyPage가 없으면 user_id를 사용
+        else:
+          logger.debug("No sender provided")
         
-      # sender 정보 -> mypage name으로 수정
-      if 'sender' in data and data['sender']:
-        logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
-        try:
-            sender = get_object_or_404(MyPage, user=int(data['sender']))
-            sender_serializer = MyPageSerializer(sender)
-            data['sender'] = sender_serializer.data['name']
-            logger.debug(f"Sender found: {data['sender']}")
-        except Http404:
-            logger.warning(f"MyPage not found for sender: {data['sender']}. Using user_id as fallback.")
-            data['sender'] = user_id  # MyPage가 없으면 user_id를 사용
+          return Response(data=data, status=HTTP_200_OK)
       else:
-        logger.debug("No sender provided")
+        return Response({"error": patch_serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
-        return Response(data=data, status=HTTP_200_OK)
-    
     else:
       return Response({"error": wish_items_serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
