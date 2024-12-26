@@ -18,11 +18,18 @@ class SignupView(views.APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response({'message': '회원가입 성공!', 'data': serializer.data}, status=status.HTTP_201_CREATED)
+            user = serializer.save()  # 유저 저장
+            # 토큰 생성
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'message': '회원가입 성공!',
+                'data': serializer.data,
+                'access': str(refresh.access_token),  # 액세스 토큰
+                'refresh': str(refresh),  # 리프레시 토큰 (선택적으로 제공)
+            }, status=status.HTTP_201_CREATED)
 
-        print(serializer.errors) 
-                # validation error 처리 시 status와 message 포함
+        print(serializer.errors)
+        # validation error 처리 시 status와 message 포함
         formatted_errors = []
         for field, error_list in serializer.errors.items():
             if field:  # 필드가 있을 경우
