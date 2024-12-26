@@ -20,7 +20,8 @@ class SignupView(views.APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({'message': '회원가입 성공!', 'data': serializer.data}, status=status.HTTP_201_CREATED)
-        
+
+        print(serializer.errors) 
                 # validation error 처리 시 status와 message 포함
         formatted_errors = []
         for field, error_list in serializer.errors.items():
