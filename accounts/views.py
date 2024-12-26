@@ -21,6 +21,7 @@ logger = logging.getLogger('django')
 
 class SignupView(views.APIView):
     def post(self, request):
+        logger.debug("Request data: %s", request.data)
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()  # 유저 저장
