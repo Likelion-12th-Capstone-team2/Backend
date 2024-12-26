@@ -72,6 +72,12 @@ class WishView(views.APIView):
     page = get_object_or_404(MyPage, user=user_id)
     mypage_serializer = MyPageSerializer(page)
 
+    wish_item_data = wish_items_serializer.data.copy()
+    base_url = "http://ireallywantit.xyz"
+    for item in wish_item_data:
+        if item.get('item_image'):
+            item['item_image'] = f"{base_url}{item['item_image']}"
+
     data = {
       'user': user,
       'catagory': category_serializer.data,
