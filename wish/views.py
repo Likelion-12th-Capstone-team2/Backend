@@ -210,8 +210,10 @@ class WishItemView(views.APIView):
     
 
     wishitem = get_object_or_404(Wish, id=item_id)
-    wish_items_serializer = WishItemGetSerializer(wishitem)
+    wish_items_serializer = WishItemGetSerializer(wishitem, partial=True)
     user_id = wishitem.user.id
+
+
 
     # user_id가 현재 접근하고 있는 유저인지 확인
     if user_id != request.user.id:
@@ -227,15 +229,62 @@ class WishItemView(views.APIView):
 
       # 데이터를 새로 구성
       data = dict(wish_items_serializer.data)
+
+      # 이미지 유무에 따른 데이터 변환
+      if 'item_image' in data and data['item_image']:
+          item_image = request.FILES.get('item_image')
+          image_url = request.data.get('item_image')
+          if item_image:
+            data['item_image'] = item_image
+          elif image_url:
+            try:
+              req = urllib.request.Request(image_url, headers={'User-Agent': 'Mozilla/5.0'})
+              response = urllib.request.urlopen(req)
+              image_data = response.read()
+
+              try:
+                Image.open(io.BytesIO(image_data)).verify()
+              except (IOError, SyntaxError):
+                return Response({"error": "유효한 이미지 URL이 아닙니다."}, status=HTTP_400_BAD_REQUEST)
+              
+              image_name = image_url.split("/")[-1]
+              image_content = ContentFile(image_data)
+              image_content.name = image_name
+
+              data = request.data.copy()
+              data['item_image'] = image_content
+            
+            except HTTPError as e:
+              logger.error(f"HTTPError occurred: {e}")
+              return Response({"error": f"HTTPError: {str(e)} - 이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+            except URLError as e:
+              logger.error(f"URLError occurred: {e}")
+              return Response({"error": f"URLError: {str(e)} - 이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+            except Exception as e:
+              logger.error(f"Unknown error: {e}")
+              return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+
+          else:
+            return Response({"error": "item_image 또는 유효한 이미지 URL을 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
+
+
       data['category'] = cateogory_serializer.data['category'] 
         
       # sender 정보 -> mypage name으로 수정
       if data['sender']:
-        sender = get_object_or_404(MyPage, user=int(data['sender']))
-        sender_serializer = MyPageSerializer(sender)
-        data['sender'] = sender_serializer.data['name']
+        logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
+        try:
+            sender = get_object_or_404(MyPage, user=int(data['sender']))
+            sender_serializer = MyPageSerializer(sender)
+            data['sender'] = sender_serializer.data['name']
+            logger.debug(f"Sender found: {data['sender']}")
+        except Http404:
+            logger.warning(f"MyPage not found for sender: {data['sender']}. Using user_id as fallback.")
+            data['sender'] = user_id  # MyPage가 없으면 user_id를 사용
+      else:
+        logger.debug("No sender provided")
 
-      return Response(data=data, status=HTTP_200_OK)
+        return Response(data=data, status=HTTP_200_OK)
     
     else:
       return Response({"error": wish_items_serializer.errors}, status=HTTP_400_BAD_REQUEST)
