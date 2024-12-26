@@ -107,7 +107,8 @@ class WishView(views.APIView):
             data['item_image'] = item_image
         elif image_url:  # URL로 제공된 경우
             try:
-                response = urlopen(image_url)
+                req = urllib.request.Request(image_url, headers={'User-Agent': 'Mozilla/5.0'})
+                response = urllib.request.urlopen(req)
                 image_data = response.read()
 
                 # 파일이 유효한 이미지인지 확인
