@@ -8,7 +8,10 @@ from alarms.models import Alarm
 from .serializers import *
 from mypage.serializers import CategorySerializer, MyPageSerializer
 from alarms.serializers import AlarmSerializer
+import logging
 
+# 로거 생성
+logger = logging.getLogger('django')
 class WishView(views.APIView):
   # 위시 리스트 조회
   def get(self, request, user_id):
