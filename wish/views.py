@@ -84,7 +84,7 @@ class WishView(views.APIView):
       'wish_items': wish_items_serializer.data,
       'setting': mypage_serializer.data
     }
-    
+    logger.debug(f"response: {data}")
     return Response(data=data, status=HTTP_200_OK)
 
   # 위시 리스트에 아이템 생성
