@@ -171,11 +171,12 @@ class WishItemView(views.APIView):
       
     # sender 정보 -> mypage name으로 수정
     if data['sender']:
+      logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
       sender = get_object_or_404(MyPage, user=int(data['sender']))
       sender_serializer = MyPageSerializer(sender)
       data['sender'] = sender_serializer.data['name']
 
-      
+    logger.debug(f"response setting: {mypage_serializer.data}")  
     response_data = {
       'user': user,
       'item': data,
