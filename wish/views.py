@@ -284,8 +284,8 @@ class WishItemView(views.APIView):
               data['sender'] = user_id  # MyPage가 없으면 user_id를 사용
         else:
           logger.debug("No sender provided")
-        
-          return Response(data=data, status=HTTP_200_OK)
+          get_serializer = WishItemGetSerializer(wishitem)
+          return Response(data=get_serializer.data, status=HTTP_200_OK)
     else:
         return Response({"error": patch_serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
