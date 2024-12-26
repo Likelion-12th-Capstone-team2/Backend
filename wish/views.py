@@ -14,6 +14,7 @@ from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
 from PIL import Image
 import io
+from django.http import Http404
 # 로거 생성
 logger = logging.getLogger('django')
 class WishView(views.APIView):
@@ -164,7 +165,7 @@ class WishItemView(views.APIView):
       try:
         page = get_object_or_404(MyPage, user=user_id)
         mypage_serializer = MyPageSerializer(page)
-      except MyPage.DoesNotExist:
+      except Http404:
         logger.error(f"No MyPage found for user_id: {user_id}")
     else:
       mypage_serializer=None
@@ -177,13 +178,13 @@ class WishItemView(views.APIView):
         sender_serializer = MyPageSerializer(sender)
         data['sender'] = sender_serializer.data['name']
         logger.debug(f"Sender found: {data['sender']}")
-    except MyPage.DoesNotExist:
+    except Http404:
         logger.warning(f"MyPage not found for sender: {data['sender']}. Using user_id as fallback.")
         data['sender'] = user_id  # MyPage가 없으면 user_id를 사용
     else:
       logger.debug("No sender provided")
 
-    logger.debug(f"response setting: {mypage_serializer.data}")  
+    
     response_data = {
       'user': user,
       'item': data,
