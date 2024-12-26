@@ -9,7 +9,10 @@ from .serializers import *
 from mypage.serializers import CategorySerializer, MyPageSerializer
 from alarms.serializers import AlarmSerializer
 import logging
-
+from django.core.files.base import ContentFile
+from urllib.request import urlopen
+from urllib.error import URLError, HTTPError
+from PIL import Image
 # 로거 생성
 logger = logging.getLogger('django')
 class WishView(views.APIView):
@@ -77,43 +80,59 @@ class WishView(views.APIView):
 
   # 위시 리스트에 아이템 생성
   def post(self, request, user_id):
-    
-    # 로그인을 안한 경우 400 오류
-    if not request.user.is_authenticated:
-      return Response({"error": "로그인 후 위시 아이템을 추가할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
-    
-    # user_id가 현재 접근하고 있는 유저인지 확인
-    if user_id != request.user.id:
-      return Response({"error": "위시 아이템을 추가할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
-    
-    category_id = request.data.get('category')
+        # 로그인을 안한 경우 400 오류
+        if not request.user.is_authenticated:
+            return Response({"error": "로그인 후 위시 아이템을 추가할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
 
-    if not Category.objects.filter(id=category_id, user_id=user_id).exists():
-      return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
-    logger.debug("Parsed Request data: %s", request.data)
+        # user_id가 현재 접근하고 있는 유저인지 확인
+        if user_id != request.user.id:
+            return Response({"error": "위시 아이템을 추가할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
 
-    # 이미지 URL 처리
-    image_url = request.data.get('image_url')
-    if image_url:
-      try:
-        response = requests.get(image_url)
-        response.raise_for_status()
-        image_name = image_url.split("/")[-1]  # 파일 이름 추출
-        image_content = ContentFile(response.content)
-        request.data['item_image'] = image_content
-        request.data['item_image'].name = image_name
-      except requests.RequestException as e:
-        logger.error("이미지 다운로드 오류: %s", e)
-        return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+        category_id = request.data.get('category')
 
-    
-    serializer = WishPostSerializer(data=request.data)
-    if serializer.is_valid():
-      serializer.save(user=request.user)
-      return Response(serializer.data, status=HTTP_200_OK)
-    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        if not Category.objects.filter(id=category_id, user_id=user_id).exists():
+            return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
-  
+        logger.debug("Parsed Request data: %s", request.data)
+
+        # item_image 처리
+        item_image = request.FILES.get('item_image')
+        if item_image:  # 파일로 제공된 경우
+            data = request.data.copy()
+            data['item_image'] = item_image
+        else:  # URL로 제공된 경우
+            image_url = request.data.get('image_url')
+            if image_url:
+                try:
+                    response = urlopen(image_url)
+                    image_data = response.read()
+
+                    # 파일이 유효한 이미지인지 확인
+                    try:
+                        Image.open(io.BytesIO(image_data)).verify()
+                    except (IOError, SyntaxError):
+                        return Response({"error": "유효한 이미지 URL이 아닙니다."}, status=HTTP_400_BAD_REQUEST)
+
+                    image_name = image_url.split("/")[-1]  # 파일 이름 추출
+                    image_content = ContentFile(image_data)
+                    image_content.name = image_name
+
+                    data = request.data.copy()
+                    data['item_image'] = image_content
+                except (HTTPError, URLError) as e:
+                    logger.error("이미지 다운로드 오류: %s", e)
+                    return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"error": "item_image 또는 image_url을 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
+
+        serializer = WishPostSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=HTTP_200_OK)
+
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+              
 
 # 특정 위시 아이템 조회, 수정, 삭제 
 class WishItemView(views.APIView):
