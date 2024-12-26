@@ -150,7 +150,7 @@ class WishItemView(views.APIView):
     else:
       user = request.user.id
 
-    
+    logger.debug(f"user: {user}")
 
     cateogory = get_object_or_404(Category, id=wish_items_serializer.data['category'])
     cateogory_serializer = CategorySerializer(cateogory)
@@ -160,10 +160,15 @@ class WishItemView(views.APIView):
     data['category'] = cateogory_serializer.data['category'] 
 
     if user != 'guest':
-      page = get_object_or_404(MyPage, user=user_id)
-      mypage_serializer = MyPageSerializer(page)
+      logger.debug(f"Attempting to get MyPage for user_id: {user_id}")
+      try:
+        page = get_object_or_404(MyPage, user=user_id)
+        mypage_serializer = MyPageSerializer(page)
+      except MyPage.DoesNotExist:
+        logger.error(f"No MyPage found for user_id: {user_id}")
     else:
       mypage_serializer=None
+      
     # sender 정보 -> mypage name으로 수정
     if data['sender']:
       sender = get_object_or_404(MyPage, user=int(data['sender']))
