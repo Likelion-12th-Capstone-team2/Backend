@@ -91,6 +91,22 @@ class WishView(views.APIView):
     if not Category.objects.filter(id=category_id, user_id=user_id).exists():
       return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
     logger.debug("Parsed Request data: %s", request.data)
+
+    # 이미지 URL 처리
+    image_url = request.data.get('image_url')
+    if image_url:
+      try:
+        response = requests.get(image_url)
+        response.raise_for_status()
+        image_name = image_url.split("/")[-1]  # 파일 이름 추출
+        image_content = ContentFile(response.content)
+        request.data['item_image'] = image_content
+        request.data['item_image'].name = image_name
+      except requests.RequestException as e:
+        logger.error("이미지 다운로드 오류: %s", e)
+        return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+
+    
     serializer = WishPostSerializer(data=request.data)
     if serializer.is_valid():
       serializer.save(user=request.user)
