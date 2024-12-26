@@ -23,9 +23,11 @@ class SignupView(views.APIView):
             refresh = RefreshToken.for_user(user)
             return Response({
                 'message': '회원가입 성공!',
-                'data': serializer.data,
-                'access': str(refresh.access_token),  # 액세스 토큰
-                'refresh': str(refresh),  # 리프레시 토큰 (선택적으로 제공)
+                'data': {
+                    'id': user.id,  # 유저 ID 추가
+                    'username': user.username,  # 유저 이름 추가
+                    'access_token': str(refresh.access_token),  # 액세스 토큰
+                }
             }, status=status.HTTP_201_CREATED)
 
         print(serializer.errors)
@@ -58,7 +60,6 @@ class SignupView(views.APIView):
             return Response({'message': '회원가입 실패!', 'errors': formatted_errors}, status=response_status)
         
         return Response({'message': '회원가입 실패!', 'errors': formatted_errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class LoginView(views.APIView):
     serializer_class = LoginSerializer
