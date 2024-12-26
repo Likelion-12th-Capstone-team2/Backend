@@ -14,6 +14,7 @@ from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
 from PIL import Image
 import io
+import urllib.request
 from django.http import Http404
 # 로거 생성
 logger = logging.getLogger('django')
@@ -121,9 +122,16 @@ class WishView(views.APIView):
 
                 data = request.data.copy()
                 data['item_image'] = image_content
-            except (HTTPError, URLError) as e:
-                logger.error("이미지 다운로드 오류: %s", e)
-                return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+            except HTTPError as e:
+              logger.error(f"HTTPError occurred: {e}")
+              return Response({"error": f"HTTPError: {str(e)} - 이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+            except URLError as e:
+              logger.error(f"URLError occurred: {e}")
+              return Response({"error": f"URLError: {str(e)} - 이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+            except Exception as e:
+              logger.error(f"Unknown error: {e}")
+              return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+
         else:
             return Response({"error": "item_image 또는 유효한 이미지 URL을 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
 
