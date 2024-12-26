@@ -159,9 +159,11 @@ class WishItemView(views.APIView):
     data = dict(wish_items_serializer.data)
     data['category'] = cateogory_serializer.data['category'] 
 
-    page = get_object_or_404(MyPage, user=user_id)
-    mypage_serializer = MyPageSerializer(page)
-
+    if user != 'guest':
+      page = get_object_or_404(MyPage, user=user_id)
+      mypage_serializer = MyPageSerializer(page)
+    else:
+      mypage_serializer=None
     # sender 정보 -> mypage name으로 수정
     if data['sender']:
       sender = get_object_or_404(MyPage, user=int(data['sender']))
