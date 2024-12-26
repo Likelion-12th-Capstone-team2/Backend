@@ -8,7 +8,16 @@ from alarms.models import Alarm
 from .serializers import *
 from mypage.serializers import CategorySerializer, MyPageSerializer
 from alarms.serializers import AlarmSerializer
-
+import logging
+from django.core.files.base import ContentFile
+from urllib.request import urlopen
+from urllib.error import URLError, HTTPError
+from PIL import Image
+import io
+import urllib.request
+from django.http import Http404
+# 로거 생성
+logger = logging.getLogger('django')
 class WishView(views.APIView):
   # 위시 리스트 조회
   def get(self, request, user_id):
@@ -74,27 +83,66 @@ class WishView(views.APIView):
 
   # 위시 리스트에 아이템 생성
   def post(self, request, user_id):
-    
-    # 로그인을 안한 경우 400 오류
-    if not request.user.is_authenticated:
-      return Response({"error": "로그인 후 위시 아이템을 추가할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
-    
-    # user_id가 현재 접근하고 있는 유저인지 확인
-    if user_id != request.user.id:
-      return Response({"error": "위시 아이템을 추가할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
-    
-    category_id = request.data.get('category')
+        # 로그인을 안한 경우 400 오류
+        if not request.user.is_authenticated:
+            return Response({"error": "로그인 후 위시 아이템을 추가할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
 
-    if not Category.objects.filter(id=category_id, user_id=user_id).exists():
-      return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
+        # user_id가 현재 접근하고 있는 유저인지 확인
+        if user_id != request.user.id:
+            return Response({"error": "위시 아이템을 추가할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
 
-    serializer = WishPostSerializer(data=request.data)
-    if serializer.is_valid():
-      serializer.save(user=request.user)
-      return Response(serializer.data, status=HTTP_200_OK)
-    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        category_id = request.data.get('category')
 
-  
+        if not Category.objects.filter(id=category_id, user_id=user_id).exists():
+            return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
+
+        logger.debug("Parsed Request data: %s", request.data)
+
+        # item_image 처리
+        item_image = request.FILES.get('item_image')
+        image_url = request.data.get('item_image')  # URL로 전달된 경우도 확인
+
+        if item_image:  # 파일로 제공된 경우
+            data = request.data.copy()
+            data['item_image'] = item_image
+        elif image_url:  # URL로 제공된 경우
+            try:
+                req = urllib.request.Request(image_url, headers={'User-Agent': 'Mozilla/5.0'})
+                response = urllib.request.urlopen(req)
+                image_data = response.read()
+
+                # 파일이 유효한 이미지인지 확인
+                try:
+                    Image.open(io.BytesIO(image_data)).verify()
+                except (IOError, SyntaxError):
+                    return Response({"error": "유효한 이미지 URL이 아닙니다."}, status=HTTP_400_BAD_REQUEST)
+
+                image_name = image_url.split("/")[-1]  # 파일 이름 추출
+                image_content = ContentFile(image_data)
+                image_content.name = image_name
+
+                data = request.data.copy()
+                data['item_image'] = image_content
+            except HTTPError as e:
+              logger.error(f"HTTPError occurred: {e}")
+              return Response({"error": f"HTTPError: {str(e)} - 이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+            except URLError as e:
+              logger.error(f"URLError occurred: {e}")
+              return Response({"error": f"URLError: {str(e)} - 이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+            except Exception as e:
+              logger.error(f"Unknown error: {e}")
+              return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({"error": "item_image 또는 유효한 이미지 URL을 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
+
+        serializer = WishPostSerializer(data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=HTTP_200_OK)
+
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+              
 
 # 특정 위시 아이템 조회, 수정, 삭제 
 class WishItemView(views.APIView):
@@ -112,7 +160,7 @@ class WishItemView(views.APIView):
     else:
       user = request.user.id
 
-    
+    logger.debug(f"user: {user}")
 
     cateogory = get_object_or_404(Category, id=wish_items_serializer.data['category'])
     cateogory_serializer = CategorySerializer(cateogory)
@@ -121,16 +169,31 @@ class WishItemView(views.APIView):
     data = dict(wish_items_serializer.data)
     data['category'] = cateogory_serializer.data['category'] 
 
-    page = get_object_or_404(MyPage, user=user_id)
-    mypage_serializer = MyPageSerializer(page)
-
+    if user != 'guest':
+      logger.debug(f"Attempting to get MyPage for user_id: {user_id}")
+      try:
+        page = get_object_or_404(MyPage, user=user_id)
+        mypage_serializer = MyPageSerializer(page)
+      except Http404:
+        logger.error(f"No MyPage found for user_id: {user_id}")
+    else:
+      mypage_serializer=None
+      
     # sender 정보 -> mypage name으로 수정
     if data['sender']:
-      sender = get_object_or_404(MyPage, user=int(data['sender']))
-      sender_serializer = MyPageSerializer(sender)
-      data['sender'] = sender_serializer.data['name']
+      logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
+      try:
+          sender = get_object_or_404(MyPage, user=int(data['sender']))
+          sender_serializer = MyPageSerializer(sender)
+          data['sender'] = sender_serializer.data['name']
+          logger.debug(f"Sender found: {data['sender']}")
+      except Http404:
+          logger.warning(f"MyPage not found for sender: {data['sender']}. Using user_id as fallback.")
+          data['sender'] = user_id  # MyPage가 없으면 user_id를 사용
+    else:
+      logger.debug("No sender provided")
 
-      
+    
     response_data = {
       'user': user,
       'item': data,

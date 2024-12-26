@@ -13,13 +13,7 @@ pymysql.install_as_MySQLdb()
 import pymysql
 pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = os.path.dirname(os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__))))
-
-env = environ.Env(
-    DEBUG=(bool, True)
-)
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 env = environ.Env(
     DEBUG=(bool, True)
@@ -114,7 +108,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
 REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -122,6 +116,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
 
     ),
+    'TEMPLATE_PACK': 'rest_framework/vertical'
 }
 REST_USE_JWT = True
 
@@ -167,8 +162,8 @@ SIMPLE_JWT = {
 
 
 # 이미지 관련 설정
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # #s3 테스트
@@ -192,7 +187,7 @@ AUTHENTICATION_BACKENDS = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

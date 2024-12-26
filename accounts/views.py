@@ -13,9 +13,15 @@ from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_RE
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 
 # Create your views here.
+import logging
+
+# 로거 생성
+logger = logging.getLogger('django')
+
 
 class SignupView(views.APIView):
     def post(self, request):
+        logger.debug("Request data: %s", request.data)
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()  # 유저 저장
@@ -30,7 +36,7 @@ class SignupView(views.APIView):
                 }
             }, status=status.HTTP_201_CREATED)
 
-        print(serializer.errors)
+        logger.warning("Validation errors: %s", serializer.errors)
         # validation error 처리 시 status와 message 포함
         formatted_errors = []
         for field, error_list in serializer.errors.items():
