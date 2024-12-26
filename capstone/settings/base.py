@@ -122,6 +122,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
 
     ),
+    'TEMPLATE_PACK': 'rest_framework/vertical'
 }
 REST_USE_JWT = True
 
