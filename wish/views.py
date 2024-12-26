@@ -221,17 +221,15 @@ class WishItemView(views.APIView):
     
 
 
-    if wish_items_serializer.is_valid():
-      wish_items_serializer.save()
 
-      cateogory = get_object_or_404(Category, id=wish_items_serializer.data['category'])
-      cateogory_serializer = CategorySerializer(cateogory)
+    cateogory = get_object_or_404(Category, id=wish_items_serializer.data['category'])
+    cateogory_serializer = CategorySerializer(cateogory)
 
-      # 데이터를 새로 구성
-      data = dict(request.data)
+    # 데이터를 새로 구성
+    data = dict(request.data)
 
       # 이미지 유무에 따른 데이터 변환
-      if 'item_image' in data and data['item_image']:
+    if 'item_image' in data and data['item_image']:
           item_image = request.FILES.get('item_image')
           image_url = request.data.get('item_image')
           if item_image:
