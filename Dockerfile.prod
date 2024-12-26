@@ -1,3 +1,6 @@
+
+
+
 # BUILDER #
 ###########
 
@@ -6,7 +9,6 @@ FROM python:3.8.3-alpine as builder
 
 # set work directory
 WORKDIR /usr/src/app
-
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -20,7 +22,7 @@ RUN apk add --no-cache jpeg-dev zlib-dev
 RUN apk add --no-cache --virtual .build-deps build-base linux-headers
 
 # install dependencies
-COPY ./requirements.txt .
+COPY ./requirements.txt . 
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
 
@@ -50,7 +52,10 @@ RUN apk update && apk add libpq tzdata
 RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev \
-    && apk add --no-cache jpeg-dev zlib-dev mariadb-dev
+    && apk add --no-cache jpeg-dev zlib-dev mariadb-dev \
+    && apk add --no-cache chromium chromium-chromedriver xvfb \
+    && echo "Chromium and Chromedriver installed successfully!"
+
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install mysqlclient
@@ -59,6 +64,10 @@ RUN apk del build-deps
 
 # set timezone
 ENV TZ=Asia/Seoul
+
+# set environment variables for chromium
+ENV CHROME_BIN=/usr/bin/chromium-browser
+ENV CHROMEDRIVER_BIN=/usr/bin/chromedriver
 
 # copy entrypoint-prod.sh
 COPY ./config/docker/entrypoint.prod.sh $APP_HOME
@@ -71,3 +80,4 @@ RUN chown -R app:app $APP_HOME
 
 # change to the app user
 USER app
+
