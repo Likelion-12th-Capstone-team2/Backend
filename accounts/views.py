@@ -21,14 +21,6 @@ logger = logging.getLogger('django')
 
 class SignupView(views.APIView):
     def post(self, request):
-        raw_body = request.body.decode('utf-8')
-        logger.debug("Raw body: %s", raw_body)
-
-        try:
-            parsed_data = json.loads(raw_body)
-        except json.JSONDecodeError as e:
-            logger.error("Invalid JSON: %s", str(e))
-            return Response({'error': 'Invalid JSON format'}, status=status.HTTP_400_BAD_REQUEST))
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()  # 유저 저장
