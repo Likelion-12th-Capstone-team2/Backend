@@ -16,9 +16,12 @@ def setup_driver():
     options.add_argument(
         'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     )
-    service = Service(ChromeDriverManager(path="/tmp/.wdm").install())
-    driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver', options=options)
+
+    # Service 객체 생성 및 전달
+    service = Service('/usr/bin/chromedriver')  # 크롬드라이버 경로 지정
+    driver = webdriver.Chrome(service=service, options=options)
     return driver
+
 
 
 def fetch_meta_data(driver, url):
