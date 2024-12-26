@@ -145,6 +145,7 @@ class WishView(views.APIView):
         serializer = WishPostSerializer(data=data, partial=True)
         if serializer.is_valid():
             serializer.save(user=request.user)
+            logger.debug(f"response: {data}")
             return Response(serializer.data, status=HTTP_200_OK)
 
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
