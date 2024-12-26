@@ -174,22 +174,15 @@ class WishItemView(views.APIView):
     if data['sender']:
       logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
       try:
-          # data['sender']가 None이 아닐 때만 int()로 변환
-          sender_user_id = int(data['sender']) if data['sender'] is not None else None
-          if sender_user_id:
-              sender = get_object_or_404(MyPage, user=sender_user_id)
-              sender_serializer = MyPageSerializer(sender)
-              data['sender'] = sender_serializer.data['name']
-              logger.debug(f"Sender found: {data['sender']}")
-          else:
-              logger.warning(f"No valid sender provided, using user_id as fallback.")
-              data['sender'] = user_id  # MyPage가 없으면 user_id를 사용
-      except ValueError:
-          logger.error(f"Invalid sender value: {data['sender']}")
-          data['sender'] = user_id  # 잘못된 값이 있으면 user_id로 대체
+          sender = get_object_or_404(MyPage, user=int(data['sender']))
+          sender_serializer = MyPageSerializer(sender)
+          data['sender'] = sender_serializer.data['name']
+          logger.debug(f"Sender found: {data['sender']}")
+      except Http404:
+          logger.warning(f"MyPage not found for sender: {data['sender']}. Using user_id as fallback.")
+          data['sender'] = user_id  # MyPage가 없으면 user_id를 사용
     else:
-        logger.debug("No sender provided")
-        data['sender'] = user_id  # sender가 없으면 user_id를 사용
+      logger.debug("No sender provided")
 
     
     response_data = {
