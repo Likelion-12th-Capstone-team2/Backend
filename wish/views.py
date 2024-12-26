@@ -127,7 +127,7 @@ class WishView(views.APIView):
         else:
             return Response({"error": "item_image 또는 유효한 이미지 URL을 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
 
-        serializer = WishPostSerializer(data=data)
+        serializer = WishPostSerializer(data=data, partial=True)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=HTTP_200_OK)
