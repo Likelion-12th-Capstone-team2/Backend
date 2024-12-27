@@ -331,21 +331,21 @@ class SendView(views.APIView):
     if serializer.is_valid():
       serializer.save()
     
-      # 알람이 이미 존재하는지 체크
-      user = get_object_or_404(User, id=user_id)
-      existing_alarm = Alarm.objects.filter(
-        sender=request.user, 
-        receiver=user, 
-        item=wishitem
-        ).exists()  # True/False 반환
+      # # 알람이 이미 존재하는지 체크
+      # user = get_object_or_404(User, id=user_id)
+      # existing_alarm = Alarm.objects.filter(
+      #   sender=request.user, 
+      #   receiver=user, 
+      #   item=wishitem
+      #   ).exists()  # True/False 반환
       
-      if existing_alarm:
-        return Response({"message": "이미 동일한 알람이 전송되었으므로 전송되지 않습니다"}, status=HTTP_200_OK)
+      # if existing_alarm:
+      #   return Response({"message": "이미 동일한 알람이 전송되었으므로 전송되지 않습니다"}, status=HTTP_200_OK)
       
       # 알람 저장하기
       alarm_data = {
                 "sender": request.user.id,
-                "receiver": user.id,
+                "receiver": user_id,
                 "item": wishitem.id,
             }
       alarm_serializer = AlarmSerializer(data=alarm_data)
