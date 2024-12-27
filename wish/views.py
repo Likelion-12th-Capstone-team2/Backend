@@ -324,7 +324,7 @@ class SendView(views.APIView):
     
     data = {
       'is_sended': True,
-      'sender': request.user
+      'sender': request.user.id
     }
     serializer = WishItemGetSerializer(wishitem, data=data, partial=True)
 
