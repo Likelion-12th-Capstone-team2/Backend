@@ -6,6 +6,7 @@ from .models import *
 from .serializers import *
 from rest_framework import status 
 import logging
+from wish.models import Wish
 # Create your views here.
 # 로거 생성
 logger = logging.getLogger('django')
