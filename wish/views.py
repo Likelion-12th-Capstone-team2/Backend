@@ -179,7 +179,13 @@ class WishItemView(views.APIView):
         logger.error(f"No MyPage found for user_id: {user_id}")
     else:
       mypage_serializer=None
-      
+      response_data = {
+      'user': user,
+      'item': data,
+      'setting': None
+      }
+
+      return Response(data=response_data, status=HTTP_200_OK)
     # sender 정보 -> mypage name으로 수정
     if data['sender']:
       logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
