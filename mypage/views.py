@@ -70,7 +70,7 @@ class MypageView(views.APIView):
       serializer.save()
       data = {
         "user": request.user.id,
-        "setting": serializer._data
+        "setting": serializer.data
       }
       logger.debug(f'response: {data}')
       return Response(data=data, status=HTTP_200_OK)
