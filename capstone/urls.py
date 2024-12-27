@@ -11,6 +11,7 @@ urlpatterns = [
     path('wish/', include('wish.urls')),
     path('alarms/', include('alarms.urls')),
     path('crawler/', include('crawler.urls')),
+    path('webpush/', include('webpush.urls'))
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 
 

@@ -16,6 +16,10 @@ from PIL import Image
 import io
 import urllib.request
 from django.http import Http404
+from accounts.models import User
+from webpush import send_user_notification
+from django.conf import settings
+import json
 # 로거 생성
 logger = logging.getLogger('django')
 class WishView(views.APIView):
@@ -194,11 +198,17 @@ class WishItemView(views.APIView):
     else:
       logger.debug("No sender provided")
 
+    webpush = {
+      "webpush_settings" : settings.WEBPUSH_SETTINGS,
+      "vapid_key":settings.WEBPUSH_SETTINGS.VAPID_PUBLIC_KEY
+    }
+    
     
     response_data = {
       'user': user,
       'item': data,
-      'setting': mypage_serializer.data
+      'setting': mypage_serializer.data,
+      'webpush': webpush
     }
 
     return Response(data=response_data, status=HTTP_200_OK)
@@ -302,9 +312,21 @@ class SendView(views.APIView):
             }
       alarm_serializer = AlarmSerializer(data=alarm_data)
       
+      try:
+        sender = get_object_or_404(MyPage, user=request.user)
+        sender_name = sender.name
+      except Http404:
+        Response({"error": "보내는 사람의 마이페이지가 없습니다."}, status=HTTP_400_BAD_REQUEST)
+      user = get_object_or_404(User, id=user_id)
       if alarm_serializer.is_valid():
                 alarm_serializer.save()
+                payload = {"head": f"{sender_name}님이 선물을 보내셨습니다.",
+                          "body": f"{sender_name}님께서 {wishitem.item_name}을 보내셨습니다.",
+                          "icon":"/../media/Frame 318.png"}
+                payload = json.dumps(payload)
+                send_user_notification(user=user, payload=payload, ttl=1000)
                 return Response(serializer.data, status=HTTP_200_OK)
+      
       return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
