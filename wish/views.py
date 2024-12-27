@@ -182,7 +182,6 @@ class WishItemView(views.APIView):
       mypage_serializer_data=None
       
 
-      return Response(data=response_data, status=HTTP_200_OK)
     # sender 정보 -> mypage name으로 수정
     if data['sender']:
       logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
