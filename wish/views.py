@@ -175,15 +175,12 @@ class WishItemView(views.APIView):
       try:
         page = get_object_or_404(MyPage, user=user_id)
         mypage_serializer = MyPageSerializer(page)
+        mypage_serializer_data = mypage_serializer.data
       except Http404:
         logger.error(f"No MyPage found for user_id: {user_id}")
     else:
-      mypage_serializer=None
-      response_data = {
-      'user': user,
-      'item': data,
-      'setting': None
-      }
+      mypage_serializer_data=None
+      
 
       return Response(data=response_data, status=HTTP_200_OK)
     # sender 정보 -> mypage name으로 수정
@@ -204,7 +201,7 @@ class WishItemView(views.APIView):
     response_data = {
       'user': user,
       'item': data,
-      'setting': mypage_serializer.data
+      'setting': mypage_serializer_data
     }
 
     return Response(data=response_data, status=HTTP_200_OK)
