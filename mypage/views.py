@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from .models import *
 from .serializers import *
 from rest_framework import status 
-
+import logging
+from wish.models import Wish
 # Create your views here.
-
+# 로거 생성
+logger = logging.getLogger('django')
 # MyPage Post, Get, Patch 뷰
 class MypageView(views.APIView):
 
@@ -29,6 +31,7 @@ class MypageView(views.APIView):
         "user": request.user.id,
         "setting": serializer.data
       }
+      logger.debug(f'response: {data}')
       return Response(data=data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
@@ -68,8 +71,9 @@ class MypageView(views.APIView):
       serializer.save()
       data = {
         "user": request.user.id,
-        "setting": serializer._data
+        "setting": serializer.data
       }
+      logger.debug(f'response: {data}')
       return Response(data=data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
   
@@ -139,6 +143,10 @@ class CategoryView(views.APIView):
         category = Category.objects.filter(user=request.user, id=category_id).first()
         if not category:
             return Response({"error": "카테고리가 존재하지 않음"}, status=status.HTTP_404_NOT_FOUND)
+        category_obj = get_object_or_404(Category, id=category_id)
+        if Wish.objects.filter(category=category_obj).exists():
+          return Response({"error":"해당 카테고리에 위시아이템이 존재합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
 
         # 카테고리 삭제
         category.delete()

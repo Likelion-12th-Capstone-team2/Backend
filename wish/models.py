@@ -9,17 +9,17 @@ class Wish(models.Model):
   # wish로 설정한 유저 정보
   user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
 
-  is_sended = models.BooleanField(default=False)
+  is_sended = models.BooleanField(default=False, blank=True)
   # 준 유저 정보
-  sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', null=True)
+  sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', null=True, blank=True)
 
   wish_link = models.URLField(null=True, blank=True)
   item_image = models.ImageField(upload_to='items/')
   item_name = models.CharField(max_length=1000)
   price = models.IntegerField()
-  size = models.CharField(max_length=100, null=True)
-  color = models.CharField(max_length=100, null=True)
-  other_option = models.CharField(max_length=100, null=True)
+  size = models.CharField(max_length=100, null=True, blank=True)
+  color = models.CharField(max_length=100, null=True, blank=True)
+  other_option = models.CharField(max_length=100, null=True, blank=True)
   heart = models.IntegerField()
 
   #카테고리 정보

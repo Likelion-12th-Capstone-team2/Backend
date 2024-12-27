@@ -16,7 +16,7 @@ class WishPostSerializer(serializers.ModelSerializer):
 class WishItemGetSerializer(serializers.ModelSerializer):
   class Meta:
     model = Wish
-    fields = ['id', 'item_image', 'item_name', 'price', 'size', 'color', 'other_option', 'heart', 'is_sended', 'sender', 'category']
+    fields = ['id', 'item_image', 'wish_link', 'item_name', 'price', 'size', 'color', 'other_option', 'heart', 'is_sended', 'sender', 'category']
 
 
 # 위시 아이템을 생성할 때 사용하는 시리얼라이저
