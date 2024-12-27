@@ -5,9 +5,10 @@ from rest_framework.response import Response
 from .models import *
 from .serializers import *
 from rest_framework import status 
-
+import logging
 # Create your views here.
-
+# 로거 생성
+logger = logging.getLogger('django')
 # MyPage Post, Get, Patch 뷰
 class MypageView(views.APIView):
 
@@ -29,6 +30,7 @@ class MypageView(views.APIView):
         "user": request.user.id,
         "setting": serializer.data
       }
+      logger.debug(f'response: {data}')
       return Response(data=data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
@@ -70,6 +72,7 @@ class MypageView(views.APIView):
         "user": request.user.id,
         "setting": serializer._data
       }
+      logger.debug(f'response: {data}')
       return Response(data=data, status=HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
   
