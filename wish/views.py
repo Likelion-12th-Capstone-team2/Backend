@@ -344,9 +344,9 @@ class SendView(views.APIView):
       
       # 알람 저장하기
       alarm_data = {
-                "sender": request.user,
-                "receiver": user,
-                "item": wishitem,
+                "sender": request.user.id,
+                "receiver": user.id,
+                "item": wishitem.id,
             }
       alarm_serializer = AlarmSerializer(data=alarm_data)
       
