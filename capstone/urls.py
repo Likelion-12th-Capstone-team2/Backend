@@ -7,7 +7,7 @@ from .views import HealthView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('accounts/', include('allauth.urls')),
+    #path('accounts/', include('allauth.urls')),
     path('mypages/', include('mypage.urls')),
     path('wish/', include('wish.urls')),
     path('alarms/', include('alarms.urls')),
