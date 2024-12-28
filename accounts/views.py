@@ -146,10 +146,10 @@ class KakaoCallbackView(views.APIView):
             data={'email':email,'password':KAKAO_PASSWORD}
             serializer = KakaoLoginSerializer(data=data)
             if serializer.is_valid():
-                validated_data = serializer.data
+                validated_data = serializer.validated_data
                 validated_data['exist'] = True
                 # 로그인 후 발급된 access token과 함께 응답
-                validated_data['access_token'] = access_token
+                # validated_data['access_token'] = serializer.data.access_token
                 
                 return Response({'message': "카카오 로그인 성공", 'data': validated_data}, status=HTTP_200_OK)
             return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
