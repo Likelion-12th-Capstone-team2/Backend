@@ -3,7 +3,7 @@ from .models import *
 
 # 위시리스트 목록에서 객체를 조회하는 시리얼라이저
 class AlarmSerializer(serializers.ModelSerializer):
-  sender = serializers.CharField(source='sender_name', read_only=True)
+  sender_name = serializers.CharField(source='sender_name', read_only=True)
   date = serializers.SerializerMethodField()
   class Meta:
     model = Alarm
