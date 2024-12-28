@@ -91,11 +91,11 @@ KAKAO_LOGIN_URI = "https://kauth.kakao.com/oauth/authorize"
 KAKAO_TOKEN_URI = "https://kauth.kakao.com/oauth/token"
 KAKAO_PROFILE_URI = "https://kapi.kakao.com/v2/user/me"
 
-# class KakaoLoginView(views.APIView):
-#     def get(self, request):
-#         logging.debug("LoginView 실행됨됨")
-#         kakao_url =f"https://kauth.kakao.com/oauth/authorize?client_id={KAKAO_CLIENT_ID}&redirect_uri={KAKAO_REDIRECT_URI}&response_type=code"
-#         return redirect(kakao_url)
+class KakaoLoginView(views.APIView):
+    def get(self, request):
+        logging.debug("LoginView 실행됨됨")
+        kakao_url =f"https://kauth.kakao.com/oauth/authorize?client_id={KAKAO_CLIENT_ID}&redirect_uri={KAKAO_REDIRECT_URI}&response_type=code"
+        return redirect(kakao_url)
 
 class KakaoCallbackView(views.APIView):
     def post(self, request):
