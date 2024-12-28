@@ -332,7 +332,7 @@ class SendView(views.APIView):
       serializer.save()
     
       # # 알람이 이미 존재하는지 체크
-      # user = get_object_or_404(User, id=user_id)
+      user = get_object_or_404(User, id=user_id)
       # existing_alarm = Alarm.objects.filter(
       #   sender=request.user, 
       #   receiver=user, 
@@ -344,9 +344,9 @@ class SendView(views.APIView):
       
       # 알람 저장하기
       alarm_data = {
-                "sender": request.user.id,
-                "receiver": user_id,
-                "item": wishitem.id,
+                "sender": request.user,
+                "receiver": user,
+                "item": wishitem,
             }
       alarm_serializer = AlarmSerializer(data=alarm_data)
       
