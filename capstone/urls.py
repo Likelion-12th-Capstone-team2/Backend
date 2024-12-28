@@ -12,7 +12,7 @@ urlpatterns = [
     path('wish/', include('wish.urls')),
     path('alarms/', include('alarms.urls')),
     path('crawler/', include('crawler.urls')),
-    path('/health', HealthView.as_view(), name='health'),
+    path('health', HealthView.as_view(), name='health'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 
 
