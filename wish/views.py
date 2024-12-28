@@ -351,7 +351,7 @@ class SendView(views.APIView):
                 "receiver": user_id,
                 "item": wishitem.id,
             }
-      alarm_serializer = AlarmSerializer(data=alarm_data)
+      alarm_serializer = AlarmSerializer(data=alarm_data, partial=True)
       
       if alarm_serializer.is_valid():
                 alarm_serializer.save()
