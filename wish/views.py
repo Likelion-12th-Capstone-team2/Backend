@@ -44,13 +44,13 @@ class WishView(views.APIView):
     if price == '0':
         wish_items = wish_items.filter(price__lt=30000)
 
-    elif price == '30,000':
+    elif price == '30000':
         wish_items = wish_items.filter(price__gt=29999, price__lt=50000)
 
-    elif price == '50,000':
+    elif price == '50000':
         wish_items = wish_items.filter(price__gt=49999, price__lt=100000)
 
-    elif price == '100,000':
+    elif price == '100000':
         wish_items = wish_items.filter(price__gt=99999)
 
     elif price is None:
@@ -332,7 +332,7 @@ class SendView(views.APIView):
       serializer.save()
     
       # # 알람이 이미 존재하는지 체크
-      user = get_object_or_404(User, id=user_id)
+      # user = get_object_or_404(User, id=user_id)
       # existing_alarm = Alarm.objects.filter(
       #   sender=request.user, 
       #   receiver=user, 
@@ -344,9 +344,9 @@ class SendView(views.APIView):
       
       # 알람 저장하기
       alarm_data = {
-                "sender": request.user,
-                "receiver": user,
-                "item": wishitem,
+                "sender": request.user.id,
+                "receiver": user_id,
+                "item": wishitem.id,
             }
       alarm_serializer = AlarmSerializer(data=alarm_data)
       
