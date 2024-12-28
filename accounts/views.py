@@ -146,7 +146,7 @@ class KakaoCallbackView(views.APIView):
             data={'email':email,'password':KAKAO_PASSWORD}
             serializer = KakaoLoginSerializer(data=data)
             if serializer.is_valid():
-                validated_data = serializer.validated_data
+                validated_data = serializer.data
                 validated_data['exist'] = True
                 # 로그인 후 발급된 access token과 함께 응답
                 validated_data['access_token'] = access_token
