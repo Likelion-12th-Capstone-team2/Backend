@@ -69,7 +69,7 @@ INSTALLED_APPS = [
     'storages',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['http://3.36.247.165'], ['http://ireallywantit.xyz/']  # HTTP 사용 시
+CSRF_TRUSTED_ORIGINS = ['http://3.36.247.165'], ['http://ireallywantit.xyz/'], ['https://api.ireallywantit.xyz/']  # HTTP 사용 시
 
 SITE_ID = 2
 # LOGIN_REDIRECT_URL = '/'
