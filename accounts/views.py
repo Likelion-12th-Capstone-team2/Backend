@@ -93,6 +93,7 @@ KAKAO_PROFILE_URI = "https://kapi.kakao.com/v2/user/me"
 
 class KakaoLoginView(views.APIView):
     def get(self, request):
+        logging.debug("LoginView 실행됨됨")
         kakao_url =f"https://kauth.kakao.com/oauth/authorize?client_id={KAKAO_CLIENT_ID}&redirect_uri={KAKAO_REDIRECT_URI}&response_type=code"
         return redirect(kakao_url)
 
@@ -100,6 +101,7 @@ class KakaoCallbackView(views.APIView):
     def get(self, request):
 
         code = request.GET.get('code') #access_token 발급 위함
+
         if not code:
             return Response(status=HTTP_400_BAD_REQUEST)
         
