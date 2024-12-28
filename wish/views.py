@@ -311,18 +311,22 @@ class SendView(views.APIView):
   def post(self, request, user_id, item_id):
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
+      logger.debug("로그인 후 선물하기 찜을 선택할 수 있습니다.")
       return Response({"error": "로그인 후 선물하기 찜을 선택할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
     if request.user.id == user_id:
+      logger.debug("자기 자신한테 선물할 수 없습니다.")
       return Response({"error": "자기 자신한테 선물할 수 없습니다."}, status=HTTP_400_BAD_REQUEST)
     
     try:
       wishitem = get_object_or_404(Wish, id=item_id)
 
     except Http404:
+      logger.debug("위시 아이템이 존재하지 앖습니다.")
       return Response({"error":"위시 아이템이 존재하지 앖습니다."}, status=HTTP_400_BAD_REQUEST)
 
     if wishitem.is_sended:
+      logger.debug("이미 해당 위시 아이템을 선물 받았습니다.")
       return Response({"error":"이미 해당 위시 아이템을 선물 받았습니다."}, status=HTTP_400_BAD_REQUEST)
     
     data = {
@@ -354,6 +358,7 @@ class SendView(views.APIView):
       alarm_serializer = AlarmPostSerializer(data=alarm_data)
       
       if not alarm_serializer.is_valid():
+                logger.debug(f"{alarm_serializer.errors}")
                 return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
       alarm_serializer.save()
       return Response(serializer.data, status=HTTP_200_OK)
