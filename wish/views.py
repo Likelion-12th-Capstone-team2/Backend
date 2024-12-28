@@ -310,6 +310,8 @@ class WishItemView(views.APIView):
 # 위시 선물 찜하기
 class SendView(views.APIView):
   def post(self, request, user_id, item_id):
+    logger.debug(f"Authorization Header: {request.headers.get('Authorization')}")
+
     logger.debug(f"User: {request.user}")
     logger.debug(f"Is authenticated: {request.user.is_authenticated}")
     # 로그인을 안한 경우 400 오류
