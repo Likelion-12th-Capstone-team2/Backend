@@ -7,7 +7,7 @@ from mypage.models import Category, MyPage
 from alarms.models import Alarm
 from .serializers import *
 from mypage.serializers import CategorySerializer, MyPageSerializer
-from alarms.serializers import AlarmSerializer
+from alarms.serializers import AlarmPostSerializer
 import logging
 from django.core.files.base import ContentFile
 from urllib.request import urlopen
@@ -44,13 +44,13 @@ class WishView(views.APIView):
     if price == '0':
         wish_items = wish_items.filter(price__lt=30000)
 
-    elif price == '30,000':
+    elif price == '30000':
         wish_items = wish_items.filter(price__gt=29999, price__lt=50000)
 
-    elif price == '50,000':
+    elif price == '50000':
         wish_items = wish_items.filter(price__gt=49999, price__lt=100000)
 
-    elif price == '100,000':
+    elif price == '100000':
         wish_items = wish_items.filter(price__gt=99999)
 
     elif price is None:
@@ -195,6 +195,7 @@ class WishItemView(views.APIView):
     response_data = {
       'user': user,
       'item': data,
+      'receiver_id': mypage.user.id,
       'setting': mypage_serializer_data
     }
 
@@ -309,17 +310,28 @@ class WishItemView(views.APIView):
 # 위시 선물 찜하기
 class SendView(views.APIView):
   def post(self, request, user_id, item_id):
+    logger.debug(f"Authorization Header: {request.headers.get('Authorization')}")
+
+    logger.debug(f"User: {request.user}")
+    logger.debug(f"Is authenticated: {request.user.is_authenticated}")
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
+      logger.debug("로그인 후 선물하기 찜을 선택할 수 있습니다.")
       return Response({"error": "로그인 후 선물하기 찜을 선택할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
     if request.user.id == user_id:
+      logger.debug("자기 자신한테 선물할 수 없습니다.")
       return Response({"error": "자기 자신한테 선물할 수 없습니다."}, status=HTTP_400_BAD_REQUEST)
     
+    try:
+      wishitem = get_object_or_404(Wish, id=item_id)
 
-    wishitem = get_object_or_404(Wish, id=item_id)
+    except Http404:
+      logger.debug("위시 아이템이 존재하지 앖습니다.")
+      return Response({"error":"위시 아이템이 존재하지 앖습니다."}, status=HTTP_400_BAD_REQUEST)
 
     if wishitem.is_sended:
+      logger.debug("이미 해당 위시 아이템을 선물 받았습니다.")
       return Response({"error":"이미 해당 위시 아이템을 선물 받았습니다."}, status=HTTP_400_BAD_REQUEST)
     
     data = {
@@ -331,15 +343,16 @@ class SendView(views.APIView):
     if serializer.is_valid():
       serializer.save()
     
-      # 알람이 이미 존재하는지 체크
-      existing_alarm = Alarm.objects.filter(
-        sender=request.user, 
-        receiver=user_id, 
-        item=wishitem
-        ).exists()  # True/False 반환
+      # # 알람이 이미 존재하는지 체크
+      # user = get_object_or_404(User, id=user_id)
+      # existing_alarm = Alarm.objects.filter(
+      #   sender=request.user, 
+      #   receiver=user, 
+      #   item=wishitem
+      #   ).exists()  # True/False 반환
       
-      if existing_alarm:
-        return Response({"message": "이미 동일한 알람이 전송되었으므로 전송되지 않습니다"}, status=HTTP_200_OK)
+      # if existing_alarm:
+      #   return Response({"message": "이미 동일한 알람이 전송되었으므로 전송되지 않습니다"}, status=HTTP_200_OK)
       
       # 알람 저장하기
       alarm_data = {
@@ -347,12 +360,14 @@ class SendView(views.APIView):
                 "receiver": user_id,
                 "item": wishitem.id,
             }
-      alarm_serializer = AlarmSerializer(data=alarm_data)
+      alarm_serializer = AlarmPostSerializer(data=alarm_data)
       
-      if alarm_serializer.is_valid():
-                alarm_serializer.save()
-                return Response(serializer.data, status=HTTP_200_OK)
-      return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
+      if not alarm_serializer.is_valid():
+                logger.debug(f"{alarm_serializer.errors}")
+                return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
+      alarm_serializer.save()
+      return Response(serializer.data, status=HTTP_200_OK)
+      
 
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
   

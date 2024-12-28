@@ -3,6 +3,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import *
 from django.contrib.auth.hashers import make_password
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
+import json
 
 class UserSerializer(serializers.ModelSerializer):
     
@@ -101,5 +102,14 @@ class KakaoLoginSerializer(serializers.Serializer):
 
         if not password:
             raise serializers.ValidationError(('비밀번호가 필요합니다'))
-
+        user = User.objects.get(email=email)
+        token = RefreshToken.for_user(user)
+        refresh = str(token)
+        access = str(token.access_token)
+        data =  {
+            'id': user.id,
+            'username': user.username,
+            'access_token': access
+        }
+        
         return data
