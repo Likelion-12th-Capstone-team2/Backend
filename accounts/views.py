@@ -98,9 +98,9 @@ class KakaoLoginView(views.APIView):
         return redirect(kakao_url)
 
 class KakaoCallbackView(views.APIView):
-    def post(self, request):
+    def get(self, request):
 
-        code = request.data.get('code')
+        code = request.GET.get('code') #access_token 발급 위함
 
         if not code:
             return Response(status=HTTP_400_BAD_REQUEST)
