@@ -309,6 +309,8 @@ class WishItemView(views.APIView):
 # 위시 선물 찜하기
 class SendView(views.APIView):
   def post(self, request, user_id, item_id):
+    logger.debug(f"User: {request.user}")
+    logger.debug(f"Is authenticated: {request.user.is_authenticated}")
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
       logger.debug("로그인 후 선물하기 찜을 선택할 수 있습니다.")
