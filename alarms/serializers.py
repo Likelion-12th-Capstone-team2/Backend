@@ -7,7 +7,7 @@ class AlarmSerializer(serializers.ModelSerializer):
   date = serializers.SerializerMethodField()
   class Meta:
     model = Alarm
-    fields = ['id', 'sender', 'receiver', 'date', 'item']
+    fields = ['id', 'sender', 'receiver', 'date', 'item', 'sender_name']
 
     def get_date(self, obj):
         return obj.date.strftime('%Y.%m.%d.')

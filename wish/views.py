@@ -346,16 +346,16 @@ class SendView(views.APIView):
       #   return Response({"message": "이미 동일한 알람이 전송되었으므로 전송되지 않습니다"}, status=HTTP_200_OK)
       
       # 알람 저장하기
-      # alarm_data = {
-      #           "sender": request.user.id,
-      #           "receiver": user_id,
-      #           "item": wishitem.id,
-      #       }
-      # alarm_serializer = AlarmSerializer(data=alarm_data, partial=True)
+      alarm_data = {
+                "sender": request.user.id,
+                "receiver": user_id,
+                "item": wishitem.id,
+            }
+      alarm_serializer = AlarmSerializer(data=alarm_data, partial=True)
       
-      # if not alarm_serializer.is_valid():
-      #           return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
-      # alarm_serializer.save()
+      if not alarm_serializer.is_valid():
+                return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
+      alarm_serializer.save()
       return Response(serializer.data, status=HTTP_200_OK)
       
 
