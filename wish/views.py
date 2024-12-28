@@ -351,7 +351,7 @@ class SendView(views.APIView):
                 "receiver": user_id,
                 "item": wishitem.id,
             }
-      alarm_serializer = AlarmSerializer(data=alarm_data, partial=True)
+      alarm_serializer = AlarmSerializer(data=alarm_data)
       
       if not alarm_serializer.is_valid():
                 return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
