@@ -195,6 +195,7 @@ class WishItemView(views.APIView):
     response_data = {
       'user': user,
       'item': data,
+      'receiver_id': mypage.user.id,
       'setting': mypage_serializer_data
     }
 
