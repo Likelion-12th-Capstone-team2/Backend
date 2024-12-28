@@ -7,7 +7,7 @@ from mypage.models import Category, MyPage
 from alarms.models import Alarm
 from .serializers import *
 from mypage.serializers import CategorySerializer, MyPageSerializer
-from alarms.serializers import AlarmSerializer
+from alarms.serializers import AlarmPostSerializer
 import logging
 from django.core.files.base import ContentFile
 from urllib.request import urlopen
@@ -351,7 +351,7 @@ class SendView(views.APIView):
                 "receiver": user_id,
                 "item": wishitem.id,
             }
-      alarm_serializer = AlarmSerializer(data=alarm_data)
+      alarm_serializer = AlarmPostSerializer(data=alarm_data)
       
       if not alarm_serializer.is_valid():
                 return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
