@@ -353,10 +353,11 @@ class SendView(views.APIView):
             }
       alarm_serializer = AlarmSerializer(data=alarm_data, partial=True)
       
-      if alarm_serializer.is_valid():
-                alarm_serializer.save()
-                return Response(serializer.data, status=HTTP_200_OK)
-      return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
+      if not alarm_serializer.is_valid():
+                return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
+      alarm_serializer.save()
+      return Response(serializer.data, status=HTTP_200_OK)
+      
 
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
   
