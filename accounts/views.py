@@ -164,7 +164,7 @@ class KakaoCallbackView(views.APIView):
                 )
                 return res
 
-            return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+            #return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
         # 이메일 정보가 없는 경우
         if not email:
