@@ -97,9 +97,6 @@ class KakaoLoginView(views.APIView):
         kakao_url =f"https://kauth.kakao.com/oauth/authorize?client_id={KAKAO_CLIENT_ID}&redirect_uri={KAKAO_REDIRECT_URI}&response_type=code"
         return redirect(kakao_url)
 
-from urllib.parse import urlencode
-from django.shortcuts import redirect
-
 class KakaoCallbackView(views.APIView):
     def get(self, request):
         code = request.GET.get('code')  # access_token 발급 위함
@@ -168,18 +165,8 @@ class KakaoCallbackView(views.APIView):
             return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
         except User.DoesNotExist:
-            # 회원가입으로 리다이렉트 하기 전에 URL을 쿼리로 설정
-            user_data = {
-                'email': email,
-                'access_token': access_token,
-                'refresh_token': refresh_token,
-            }
-
-            query_string = urlencode(user_data)
-            redirect_url = f'https://12th-ewha-capstone.vercel.app/signup/?{query_string}'
-
-            # 리다이렉트
-            res = redirect(redirect_url)
+            # 카카오 회원가입으로 리다이렉트
+            res = redirect(f'/accounts/kakao/signup/?email={email}')
             res.set_cookie(
                 "accessToken", value=access_token, max_age=None, expires=None, 
                 secure=True, samesite="None", httponly=True
