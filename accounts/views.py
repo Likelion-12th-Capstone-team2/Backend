@@ -165,63 +165,50 @@ class KakaoCallbackView(views.APIView):
             return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
         except User.DoesNotExist:
-
-            # 회원가입 데이터를 구성
-            request_data = {
-                'email': f"{email}",  # KakaoUser prefix 추가
-                'password': KAKAO_PASSWORD,  # 미리 정의된 카카오 비밀번호 사용
-            }
-
-            # KakaoLoginSerializer를 사용하여 회원가입 처리
-            serializer = KakaoLoginSerializer(data=request_data)
-            if serializer.is_valid():
-                user = serializer.save()
-
-                # JWT 토큰 발급
-                refresh = RefreshToken.for_user(user)
-                access_token = str(refresh.access_token)
-
-                user_data = {
-                    'id': user.id,
-                    'email': user.email,
-                    'username': user.username,
-                    'access_token': access_token,  # 로그인 후 사용할 access token
-                    } 
-                return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
-            return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+            # 카카오 회원가입으로 리다이렉트
+            res = redirect(f'/accounts/kakao/signup/?email={email}')
+            res.set_cookie(
+                "accessToken", value=access_token, max_age=None, expires=None, 
+                secure=True, samesite="None", httponly=True
+            )
+            res.set_cookie(
+                "refreshToken", value=refresh_token, max_age=None, expires=None, 
+                secure=True, samesite="None", httponly=True
+            )
+            return res
 
 
 
-# class KakaoSignupView(views.APIView):
-#     def get(self, request):  
-#         # 쿼리 매개변수에서 email 가져오기
-#         email = request.GET.get('email', None)
-#         if not email:
-#             return Response({'message': '이메일 정보가 없습니다.'}, status=HTTP_400_BAD_REQUEST)
+class KakaoSignupView(views.APIView):
+    def get(self, request):  
+        # 쿼리 매개변수에서 email 가져오기
+        email = request.GET.get('email', None)
+        if not email:
+            return Response({'message': '이메일 정보가 없습니다.'}, status=HTTP_400_BAD_REQUEST)
 
-#         # 회원가입 데이터를 구성
-#         request_data = {
-#             'email': f"{email}",  # KakaoUser prefix 추가
-#             'password': KAKAO_PASSWORD,  # 미리 정의된 카카오 비밀번호 사용
-#         }
+        # 회원가입 데이터를 구성
+        request_data = {
+            'email': f"{email}",  # KakaoUser prefix 추가
+            'password': KAKAO_PASSWORD,  # 미리 정의된 카카오 비밀번호 사용
+        }
 
-#         # KakaoLoginSerializer를 사용하여 회원가입 처리
-#         serializer = KakaoLoginSerializer(data=request_data)
-#         if serializer.is_valid():
-#             user = serializer.save()
+        # KakaoLoginSerializer를 사용하여 회원가입 처리
+        serializer = KakaoLoginSerializer(data=request_data)
+        if serializer.is_valid():
+            user = serializer.save()
 
-#             # JWT 토큰 발급
-#             refresh = RefreshToken.for_user(user)
-#             access_token = str(refresh.access_token)
+            # JWT 토큰 발급
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
 
-#             user_data = {
-#                 'id': user.id,
-#                 'email': user.email,
-#                 'username': user.username,
-#                 'access_token': access_token,  # 로그인 후 사용할 access token
-#                 } 
-#             return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
-#         return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+            user_data = {
+                'id': user.id,
+                'email': user.email,
+                'username': user.username,
+                'access_token': access_token,  # 로그인 후 사용할 access token
+                } 
+            return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
+        return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
     
 
 
