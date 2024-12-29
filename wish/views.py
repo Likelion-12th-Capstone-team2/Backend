@@ -416,3 +416,5 @@ class ToMyWishView(views.APIView):
     #불러온 wish 정보를 반환
     serializer = ToMyWishSerializer(target_wish)
     return Response(serializer.data, status=HTTP_200_OK)
+
+
