@@ -8,17 +8,20 @@ from rest_framework.status import *
 
 class AlarmView(APIView):
     def get(self, request):
-        user = request.user  # 현재 로그인된 사용자
+        user = request.user
 
-        # 로그인을 안한 경우 400 오류
-        if not user.is_authenticated:
-            return Response({"error": "로그인 후 알람을 확인하세요"}, status=HTTP_400_BAD_REQUEST)
+        # 유효하지 않은 사용자 처리
+        if not user or not user.is_authenticated:
+            return Response(
+                {"error": "로그인 후 알람을 확인하세요"}, 
+                status=HTTP_400_BAD_REQUEST
+            )
 
-        # 최신 알림이 먼저 오게 함
-        alarms = Alarm.objects.filter(receiver=user).order_by('-date')  # 수신자가 현재 사용자
-        serializer = AlarmSerializer(alarms, many=True)  # 여러 객체 직렬화
-        
+        # 최신 알림 조회
+        alarms = Alarm.objects.filter(receiver=user).order_by('-date')
+        serializer = AlarmSerializer(alarms, many=True)
+
         return Response({
             'message': '알림 조회 성공!',
             'data': serializer.data
-        })
+        }, status=HTTP_200_OK)
