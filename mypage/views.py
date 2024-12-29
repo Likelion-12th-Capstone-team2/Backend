@@ -18,10 +18,12 @@ class MypageView(views.APIView):
 
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
+      logger.debug("로그인 후 mypage를 생성할 수 있습니다.")
       return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
     # 이미 mypage가 생성된 유저인 경우 400 오류
     if MyPage.objects.filter(user=request.user).exists():
+      logger.debug("이미 mypage가 생성된 유저입니다.")
       return Response({"error": "이미 mypage가 생성된 유저입니다."}, status=HTTP_400_BAD_REQUEST)
 
     serializer = MyPageSerializer(data=request.data)
@@ -33,6 +35,7 @@ class MypageView(views.APIView):
       }
       logger.debug(f'response: {data}')
       return Response(data=data, status=HTTP_200_OK)
+    logger.debug(f"{serializer.errors}")
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
   def get(self, request):
@@ -58,10 +61,12 @@ class MypageView(views.APIView):
   def patch(self, request):
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
+      logger.debug("로그인 후 mypage를 생성할 수 있습니다.")
       return Response({"error": "로그인 후 mypage를 생성할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
     # mypage가 생성되지 않은 유저인 경우 400 오류
     if not MyPage.objects.filter(user=request.user).exists:
+      logger.debug("mypage가 생성되지 않은 유저입니다.")
       return Response({"error": "mypage가 생성되지 않은 유저입니다."}, status=HTTP_400_BAD_REQUEST)
     
     # mypage 반환
@@ -75,6 +80,7 @@ class MypageView(views.APIView):
       }
       logger.debug(f'response: {data}')
       return Response(data=data, status=HTTP_200_OK)
+    logger.debug(f"{serializer.errors}")
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
   
 
