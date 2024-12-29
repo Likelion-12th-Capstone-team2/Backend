@@ -471,7 +471,7 @@ class SendView(views.APIView):
 
 
 #다른 사람 위시리스트의 위시 -> 내 위시리스트로 가져오기
-class ToMyWishView(views.APIView):
+class ToMyWishView(views.APIView):  
   def get(self, request, item_id):
     # 로그인 여부 확인
     if not request.user.is_authenticated:
