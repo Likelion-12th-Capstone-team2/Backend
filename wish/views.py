@@ -91,9 +91,9 @@ class WishView(views.APIView):
         if user_id != request.user.id:
             return Response({"error": "위시 아이템을 추가할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
 
-        logger.debug(f"category id: {category_id}")
+        
         category_id = request.data.get('category')
-
+        logger.debug(f"category id: {category_id}")
         if not Category.objects.filter(id=category_id, user=request.user).exists():
             return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
