@@ -146,7 +146,7 @@ class KakaoCallbackView(views.APIView):
         logger.debug(f"user_in_db: {user_se.data}")
         if user_in_db is not None:
             # 이미 가입된 사용자인 경우
-            data = {'email': email, 'password': KAKAO_PASSWORD}
+            data = {'email': email, 'password': KAKAO_PASSWORD, 'access_token': access_token}
             serializer = KakaoLoginSerializer(data=data)
 
             if serializer.is_valid():
