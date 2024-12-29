@@ -15,6 +15,7 @@ from urllib.error import URLError, HTTPError
 from PIL import Image
 import io
 import urllib.request
+import base64
 from django.http import Http404
 # 로거 생성
 logger = logging.getLogger('django')
@@ -103,6 +104,7 @@ class WishView(views.APIView):
         # item_image 처리
         item_image = request.FILES.get('item_image')
         image_url = request.data.get('item_image')  # URL로 전달된 경우도 확인
+        image_base64 = request.data.get('item_image_base64')
 
         if item_image:  # 파일로 제공된 경우
             data = request.data.copy()
@@ -136,9 +138,31 @@ class WishView(views.APIView):
               logger.error(f"Unknown error: {e}")
               return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
 
-        else:
-            return Response({"error": "item_image 또는 유효한 이미지 URL을 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
+        elif image_base64:  # Base64로 제공된 경우
+          try:
+              format, imgstr = image_base64.split(';base64,')
+              ext = format.split('/')[-1]  # 파일 확장자 추출
+              image_data = base64.b64decode(imgstr)
+              
+              # 파일이 유효한 이미지인지 확인
+              try:
+                  Image.open(io.BytesIO(image_data)).verify()
+              except (IOError, SyntaxError):
+                  logger.error("유효한 Base64 이미지 데이터가 아닙니다.")
+                  return Response({"error": "유효한 Base64 이미지 데이터가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
+              image_name = f"uploaded_image.{ext}"  # 임의의 파일 이름 생성
+              image_content = ContentFile(image_data)
+              image_content.name = image_name
+
+              data = request.data.copy()
+              data['item_image'] = image_content
+          except Exception as e:
+              logger.error(f"Base64 처리 중 오류 발생: {e}")
+              return Response({"error": "Base64 이미지 처리 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
+        else:
+            logger.error("item_image, 유효한 이미지 URL, 또는 Base64 데이터를 제공해야 합니다.")
+            return Response({"error": "item_image, 유효한 이미지 URL, 또는 Base64 데이터를 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
         serializer = WishPostSerializer(data=data, partial=True)
         if serializer.is_valid():
             serializer.save(user=request.user)
