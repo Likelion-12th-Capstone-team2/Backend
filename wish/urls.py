@@ -10,4 +10,4 @@ urlpatterns=[
   path('<int:user_id>/', WishView.as_view()),
   path('tomywish/<int:item_id>/', ToMyWishView.as_view()),
   
-]         
+]           
