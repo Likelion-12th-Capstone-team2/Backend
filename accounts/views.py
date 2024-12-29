@@ -13,7 +13,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_RE
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 
 # Create your views here.
-import logging
+import logging  
 
 # 로거 생성
 logger = logging.getLogger('django')
