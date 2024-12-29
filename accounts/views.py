@@ -139,10 +139,11 @@ class KakaoCallbackView(views.APIView):
         user_info_json = user_info_res.json()
         social_id = str(user_info_json.get('id'))
         email = user_info_json.get('kakao_account', {}).get('email')
-        
+        logger.debug(f"email: {email}")
         # 사용자 데이터 검색
         user_in_db = User.objects.filter(email=email).first()
-
+        user_se = UserSerializer(user_in_db)
+        logger.debug(f"user_in_db: {user_se.data}")
         if user_in_db is not None:
             # 이미 가입된 사용자인 경우
             data = {'email': email, 'password': KAKAO_PASSWORD}
@@ -164,7 +165,7 @@ class KakaoCallbackView(views.APIView):
                 )
                 return res
 
-            return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+            #return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
         # 이메일 정보가 없는 경우
         if not email:
