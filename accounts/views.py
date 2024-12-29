@@ -165,6 +165,7 @@ class KakaoCallbackView(views.APIView):
                     'username': user_in_db.username,
                     'access_token': access_token,
                     'refresh_token': refresh_token,  # refresh_token도 포함하여 반환
+                    'exist': True,
                 }
 
                 return Response({'message': "카카오 로그인 성공", 'data': user_data}, status=HTTP_200_OK)
