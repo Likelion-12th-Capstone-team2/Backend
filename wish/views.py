@@ -17,6 +17,8 @@ import io
 import urllib.request
 import base64
 from django.http import Http404
+import os
+from urllib.parse import urlparse
 # 로거 생성
 logger = logging.getLogger('django')
 class WishView(views.APIView):
@@ -114,6 +116,12 @@ class WishView(views.APIView):
                 req = urllib.request.Request(image_url, headers={'User-Agent': 'Mozilla/5.0'})
                 response = urllib.request.urlopen(req)
                 image_data = response.read()
+                
+                parsed = urlparse(image_url)
+                filename = os.path.basename(parsed.path)
+
+                image_content = ContentFile(image_data)
+                image_content.name = filename
 
                 # 파일이 유효한 이미지인지 확인
                 try:
@@ -122,7 +130,7 @@ class WishView(views.APIView):
                     logger.error("유효한 이미지 URL이 아닙니다.")
                     return Response({"error": "유효한 이미지 URL이 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
-                image_name = image_url.split("/")[-1]  # 파일 이름 추출
+                # image_name = image_url.split("/")[-1]  # 파일 이름 추출
                 image_content = ContentFile(image_data)
                 image_content.name = image_name
 
