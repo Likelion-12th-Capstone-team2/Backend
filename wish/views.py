@@ -95,6 +95,7 @@ class WishView(views.APIView):
         category_id = request.data.get('category')
         logger.debug(f"category id: {category_id}")
         if not Category.objects.filter(id=category_id, user=request.user).exists():
+            logger.error("해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다.")
             return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
         logger.debug("Parsed Request data: %s", request.data)
@@ -116,6 +117,7 @@ class WishView(views.APIView):
                 try:
                     Image.open(io.BytesIO(image_data)).verify()
                 except (IOError, SyntaxError):
+                    logger.error("유효한 이미지 URL이 아닙니다.")
                     return Response({"error": "유효한 이미지 URL이 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
                 image_name = image_url.split("/")[-1]  # 파일 이름 추출
@@ -142,7 +144,7 @@ class WishView(views.APIView):
             serializer.save(user=request.user)
             logger.debug(f"response: {data}")
             return Response(serializer.data, status=HTTP_200_OK)
-
+        logger.error(f"{serializer.errors}")
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
               
 
