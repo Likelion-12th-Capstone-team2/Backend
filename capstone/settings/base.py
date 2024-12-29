@@ -132,8 +132,9 @@ CSRF_TRUSTED_ORIGINS = [
     'http://3.36.247.165',
     'http://ireallywantit.xyz/',
     'https://api.ireallywantit.xyz/',
-    'https://12th-ewha-capstone.vercel.app'
+    'https://12th-ewha-capstone.vercel.app',
     # 'https://yourdomain.com',  # 배포 도메인 추가
+    'https://kauth.kakao.com/oauth/authorize'
 ]
 
 CSRF_COOKIE_SECURE = False  # 로컬 개발 환경에서만 False로 설정
