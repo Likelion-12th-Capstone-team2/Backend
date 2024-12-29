@@ -141,7 +141,7 @@ class KakaoCallbackView(views.APIView):
         email = user_info_json.get('kakao_account', {}).get('email')
         
                 # 사용자 데이터 검색
-        user_in_db = User.objects.filter(email=email).first()
+        user_in_db = User.objects.filter(email=email).exists()
 
         if user_in_db:
             # 이미 가입된 사용자인 경우
