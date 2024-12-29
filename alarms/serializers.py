@@ -15,7 +15,7 @@ class AlarmSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Alarm
-        fields = ['id', 'sender', 'receiver', 'date', 'item']
+        fields = ['id', 'sender', 'receiver', 'date', 'item']  
     
 class AlarmPostSerializer(serializers.ModelSerializer):
   class Meta:
