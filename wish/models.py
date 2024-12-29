@@ -14,7 +14,7 @@ class Wish(models.Model):
   sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', null=True, blank=True)
 
   wish_link = models.URLField(null=True, blank=True)
-  item_image = models.ImageField(upload_to='items/')
+  item_image = models.ImageField(upload_to='items/', default='../media/items/Frame 78 (2).png')
   item_name = models.CharField(max_length=1000)
   price = models.IntegerField()
   size = models.CharField(max_length=100, null=True, blank=True)
