@@ -184,14 +184,14 @@ class KakaoCallbackView(views.APIView):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
 
-                user_data = {
-                    'id': user.id,
-                    'email': user.email,
-                    'username': user.username,
-                    'access_token': access_token,  # 로그인 후 사용할 access token
-                    } 
-                return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
-            return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+            user_data = {
+                'id': user.id,
+                'email': user.email,
+                'username': user.username,
+                'access_token': access_token,  # 로그인 후 사용할 access token
+                } 
+            return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
+        return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
     
 
 
