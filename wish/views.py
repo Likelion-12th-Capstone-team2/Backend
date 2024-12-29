@@ -89,6 +89,7 @@ class WishView(views.APIView):
         # 로그인을 안한 경우 400 오류
 
         logger.debug(f"Request headers: {request.headers}")
+        logger.debug(f"Request body: {request.data}")
         if not request.user.is_authenticated:
             return Response({"error": "로그인 후 위시 아이템을 추가할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
 
