@@ -105,7 +105,13 @@ class WishView(views.APIView):
             return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
         logger.debug("Parsed Request data: %s", request.data)
-
+        item_image = data.get('item_image', None)
+    
+    # item_image가 없거나, null/None/빈 문자열로 들어올 경우
+        if (not item_image) or (isinstance(item_image, str) and item_image.lower() in ['null', 'none', '']):
+          # 기본 URL 이미지로 대체
+          data['item_image'] = 'https://minsihihi-wish-bucket.s3.ap-northeast-2.amazonaws.com/images/Frame_78_2.png'
+    
         # item_image 처리
         item_image = request.FILES.get('item_image')
         image_url = request.data.get('item_image')  # URL로 전달된 경우도 확인
@@ -130,14 +136,9 @@ class WishView(views.APIView):
                 try:
                     Image.open(io.BytesIO(image_data)).verify()
                 except (IOError, SyntaxError):
-                    default_image_path = 'media/items/Frame 78 (2).png'  # 기본 이미지 경로
-                    if os.path.exists(default_image_path):
-                        with open(default_image_path, 'rb') as f:
-                            default_image_data = f.read()
-                        default_image_content = ContentFile(default_image_data)
-                        default_image_content.name = os.path.basename(default_image_path)  # 파일 이름 설정
-                        
-                        
+                    logger.error("유효한 이미지 URL이 아닙니다.")
+                    return Response({"error": "유효한 이미지 URL이 아닙니다."}, status=HTTP_400_BAD_REQUEST)
+
                 # image_name = image_url.split("/")[-1]  # 파일 이름 추출
                 # image_content = ContentFile(image_data)
                 # image_content.name = image_name
@@ -145,24 +146,14 @@ class WishView(views.APIView):
                 data = request.data.copy()
                 data['item_image'] = image_content
             except HTTPError as e:
-              default_image_path = 'media/items/Frame 78 (2).png'  # 기본 이미지 경로
-              if os.path.exists(default_image_path):
-                        with open(default_image_path, 'rb') as f:
-                            default_image_data = f.read()
-                        default_image_content = ContentFile(default_image_data)
-                        default_image_content.name = os.path.basename(default_image_path)  # 파일 이름 설정
+              logger.error(f"HTTPError occurred: {e}")
+              return Response({"error": f"HTTPError: {str(e)} - 이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
             except URLError as e:
-              if os.path.exists(default_image_path):
-                        with open(default_image_path, 'rb') as f:
-                            default_image_data = f.read()
-                        default_image_content = ContentFile(default_image_data)
-                        default_image_content.name = os.path.basename(default_image_path)  # 파일 이름 설정
+              logger.error(f"URLError occurred: {e}")
+              return Response({"error": f"URLError: {str(e)} - 이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
             except Exception as e:
-              if os.path.exists(default_image_path):
-                        with open(default_image_path, 'rb') as f:
-                            default_image_data = f.read()
-                        default_image_content = ContentFile(default_image_data)
-                        default_image_content.name = os.path.basename(default_image_path)  # 파일 이름 설정
+              logger.error(f"Unknown error: {e}")
+              return Response({"error": "이미지 다운로드 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
 
         elif image_base64:  # Base64로 제공된 경우
           try:
@@ -174,11 +165,8 @@ class WishView(views.APIView):
               try:
                   Image.open(io.BytesIO(image_data)).verify()
               except (IOError, SyntaxError):
-                  if os.path.exists(default_image_path):
-                        with open(default_image_path, 'rb') as f:
-                            default_image_data = f.read()
-                        default_image_content = ContentFile(default_image_data)
-                        default_image_content.name = os.path.basename(default_image_path)  # 파일 이름 설정
+                  logger.error("유효한 Base64 이미지 데이터가 아닙니다.")
+                  return Response({"error": "유효한 Base64 이미지 데이터가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
               image_name = f"uploaded_image.{ext}"  # 임의의 파일 이름 생성
               image_content = ContentFile(image_data)
@@ -187,21 +175,11 @@ class WishView(views.APIView):
               data = request.data.copy()
               data['item_image'] = image_content
           except Exception as e:
-              if os.path.exists(default_image_path):
-                        with open(default_image_path, 'rb') as f:
-                            default_image_data = f.read()
-                        default_image_content = ContentFile(default_image_data)
-                        default_image_content.name = os.path.basename(default_image_path)
-              data = request.data.copy()
-              data['item_image'] = image_content  # 파일 이름 설정
+              logger.error(f"Base64 처리 중 오류 발생: {e}")
+              return Response({"error": "Base64 이미지 처리 중 오류가 발생했습니다."}, status=HTTP_400_BAD_REQUEST)
         else:
-            if os.path.exists(default_image_path):
-                        with open(default_image_path, 'rb') as f:
-                            default_image_data = f.read()
-                        default_image_content = ContentFile(default_image_data)
-                        default_image_content.name = os.path.basename(default_image_path)  # 파일 이름 설정
-            data = request.data.copy()
-            data['item_image'] = image_content
+            logger.error("item_image, 유효한 이미지 URL, 또는 Base64 데이터를 제공해야 합니다.")
+            return Response({"error": "item_image, 유효한 이미지 URL, 또는 Base64 데이터를 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
         serializer = WishPostSerializer(data=data, partial=True)
         if serializer.is_valid():
             serializer.save(user=request.user)
@@ -499,7 +477,7 @@ class SendView(views.APIView):
 
 
 #다른 사람 위시리스트의 위시 -> 내 위시리스트로 가져오기
-class ToMyWishView(views.APIView):  
+class ToMyWishView(views.APIView):
   def get(self, request, item_id):
     # 로그인 여부 확인
     if not request.user.is_authenticated:
@@ -519,5 +497,4 @@ class ToMyWishView(views.APIView):
     #불러온 wish 정보를 반환
     serializer = ToMyWishSerializer(target_wish)
     return Response(serializer.data, status=HTTP_200_OK)
-
 
