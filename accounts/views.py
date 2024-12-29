@@ -144,6 +144,7 @@ class KakaoCallbackView(views.APIView):
         user_in_db = User.objects.filter(email=email).first()
         user_se = UserSerializer(user_in_db)
         logger.debug(f"user_in_db: {user_se.data}")
+
         if user_in_db is not None:
             # 이미 가입된 사용자인 경우
             data = {'email': email, 'password': KAKAO_PASSWORD, 'access_token': access_token}
@@ -153,19 +154,20 @@ class KakaoCallbackView(views.APIView):
                 validated_data = serializer.validated_data
                 validated_data['exist'] = True
 
-                # 쿠키 설정
-                res = Response({'message': "카카오 로그인 성공", 'data': validated_data}, status=HTTP_200_OK)
-                res.set_cookie(
-                    "accessToken", value=access_token, max_age=None, expires=None,
-                    secure=True, samesite="None", httponly=True
-                )
-                res.set_cookie(
-                    "refreshToken", value=refresh_token, max_age=None, expires=None,
-                    secure=True, samesite="None", httponly=True
-                )
-                return res
+                # JWT 토큰 발급
+                refresh = RefreshToken.for_user(user_in_db)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
 
-            #return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+                user_data = {
+                    'id': user_in_db.id,
+                    'email': user_in_db.email,
+                    'username': user_in_db.username,
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,  # refresh_token도 포함하여 반환
+                }
+
+                return Response({'message': "카카오 로그인 성공", 'data': user_data}, status=HTTP_200_OK)
 
         # 이메일 정보가 없는 경우
         if not email:
@@ -177,27 +179,24 @@ class KakaoCallbackView(views.APIView):
             'password': KAKAO_PASSWORD,
         }
         serializer = KakaoLoginSerializer(data=request_data)
-
         if serializer.is_valid():
             user = serializer.save()
-            # 이미 가입된 사용자인 경우
+
             # JWT 토큰 발급
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
-            refresh_token = str(refresh)
 
-            # 사용자 데이터 반환
             user_data = {
                 'id': user.id,
                 'email': user.email,
                 'username': user.username,
-                'access_token': access_token
+                'access_token': access_token,
             }
-            
-            return Response({'message': '카카오 로그인 성공', 'data': user_data}, status=HTTP_201_CREATED)
 
-        return Response({'message': '카카오 로그인 실패', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
-            
+            return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
+
+        return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+    
 
 
 class KakaoSignupView(views.APIView):
