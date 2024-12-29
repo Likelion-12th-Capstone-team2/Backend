@@ -81,7 +81,7 @@ class KakaoLoginSerializer(serializers.Serializer):
         if user:
             # 비밀번호 확인
             if not user.check_password(password):
-                raise ValidationError("잘못된 비밀번호입니다.")
+                raise serializers.ValidationError("잘못된 비밀번호입니다.")
         else:
             # 새 사용자 생성
             user = User.objects.create(
@@ -92,24 +92,36 @@ class KakaoLoginSerializer(serializers.Serializer):
         
         # 사용자 객체 반환
         return user
-    
+
     def validate(self, data):
         email = data.get("email", None)
         password = data.get("password", None)
 
         if not email:
-            raise serializers.ValidationError(('이메일이 필요합니다(필수 정보 누락)'))
+            raise serializers.ValidationError({'email': '이메일이 필요합니다(필수 정보 누락).'})
 
         if not password:
-            raise serializers.ValidationError(('비밀번호가 필요합니다'))
-        user = User.objects.get(email=email)
+            raise serializers.ValidationError({'password': '비밀번호가 필요합니다.'})
+
+        # 사용자 인증 처리
+        user = User.objects.filter(email=email).first()
+        if not user:
+            raise serializers.ValidationError({'email': '해당 이메일로 등록된 사용자가 없습니다. 회원가입을 진행하세요.'})
+
+        # 비밀번호 확인
+        if not user.check_password(password):
+            raise serializers.ValidationError({'password': '잘못된 비밀번호입니다.'})
+
+        # 토큰 생성
         token = RefreshToken.for_user(user)
         refresh = str(token)
         access = str(token.access_token)
-        data =  {
+
+        # 인증된 사용자 데이터 반환
+        return {
             'id': user.id,
             'username': user.username,
-            'access_token': access
+            'access_token': access,
+            'refresh_token': refresh,
         }
-        
-        return data
+
