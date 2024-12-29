@@ -139,7 +139,7 @@ class KakaoCallbackView(views.APIView):
         user_info_json = user_info_res.json()
         social_id = str(user_info_json.get('id'))
         email = user_info_json.get('kakao_account', {}).get('email')
-        
+        logger.debug(f"email: {email}")
         # 사용자 데이터 검색
         user_in_db = User.objects.filter(email=email).first()
         user_se = UserSerializer(user_in_db)
