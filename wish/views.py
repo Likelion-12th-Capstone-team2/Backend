@@ -105,13 +105,7 @@ class WishView(views.APIView):
             return Response({"error": "해당 카테고리는 현재 접속한 유저의 카테고리가 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
         logger.debug("Parsed Request data: %s", request.data)
-        item_image = data.get('item_image', None)
-    
-    # item_image가 없거나, null/None/빈 문자열로 들어올 경우
-        if (not item_image) or (isinstance(item_image, str) and item_image.lower() in ['null', 'none', '']):
-          # 기본 URL 이미지로 대체
-          data['item_image'] = 'https://minsihihi-wish-bucket.s3.ap-northeast-2.amazonaws.com/images/Frame_78_2.png'
-    
+
         # item_image 처리
         item_image = request.FILES.get('item_image')
         image_url = request.data.get('item_image')  # URL로 전달된 경우도 확인
@@ -497,4 +491,3 @@ class ToMyWishView(views.APIView):
     #불러온 wish 정보를 반환
     serializer = ToMyWishSerializer(target_wish)
     return Response(serializer.data, status=HTTP_200_OK)
-
