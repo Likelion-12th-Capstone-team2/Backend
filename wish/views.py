@@ -131,8 +131,8 @@ class WishView(views.APIView):
                     return Response({"error": "유효한 이미지 URL이 아닙니다."}, status=HTTP_400_BAD_REQUEST)
 
                 # image_name = image_url.split("/")[-1]  # 파일 이름 추출
-                image_content = ContentFile(image_data)
-                image_content.name = image_name
+                # image_content = ContentFile(image_data)
+                # image_content.name = image_name
 
                 data = request.data.copy()
                 data['item_image'] = image_content
