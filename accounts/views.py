@@ -144,7 +144,7 @@ class KakaoCallbackView(views.APIView):
         user_in_db = User.objects.filter(email=email).first()
         user_se = UserSerializer(user_in_db)
         logger.debug(f"user_in_db: {user_se.data}")
-        if user_in_db:
+        if user_in_db is not None:
             # 이미 가입된 사용자인 경우
             data = {'email': email, 'password': KAKAO_PASSWORD}
             serializer = KakaoLoginSerializer(data=data)
