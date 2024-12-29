@@ -140,11 +140,7 @@ class KakaoCallbackView(views.APIView):
         social_id = str(user_info_json.get('id'))
         email = user_info_json.get('kakao_account', {}).get('email')
         
-        # 사용자 데이터 검색
-        #if not email:  # 이메일이 없는 경우 처리
-        #   return Response({'message': '이메일 정보가 없습니다.'}, status=HTTP_400_BAD_REQUEST)
-
-
+                # 사용자 데이터 검색
         user_in_db = User.objects.filter(email=email).first()
 
         if user_in_db is not None:

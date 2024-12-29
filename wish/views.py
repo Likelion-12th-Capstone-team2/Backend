@@ -242,6 +242,7 @@ class WishItemView(views.APIView):
   def patch(self, request, item_id):
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
+      logger.error("로그인 후 위시 아이템을 수정할 수 있습니다.")
       return Response({"error": "로그인 후 위시 아이템을 수정할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     
 
@@ -253,6 +254,7 @@ class WishItemView(views.APIView):
 
     # user_id가 현재 접근하고 있는 유저인지 확인
     if user_id != request.user.id:
+      logger.error("위시 아이템을 수정할 권한이 없습니다.")
       return Response({"error": "위시 아이템을 수정할 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
     
 
