@@ -142,7 +142,6 @@ class KakaoCallbackView(views.APIView):
 
         # 회원가입 및 로그인 처리
         try:   
-            user_in_db = User.objects.get(email=email) 
             # Kakao 계정 아이디가 이미 가입된 경우
             data = {'email': email, 'password': KAKAO_PASSWORD}
             serializer = KakaoLoginSerializer(data=data)
