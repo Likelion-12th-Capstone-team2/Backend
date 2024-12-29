@@ -133,7 +133,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://ireallywantit.xyz',
     'https://api.ireallywantit.xyz',
     'https://api.ireallywantit.xyz/',
-    'https://12th-ewha-capstone.vercel.app'
+    'https://12th-ewha-capstone.vercel.app',
+    'https://12th-ewha-capstone.vercel.app/'
     # 'https://yourdomain.com',  # 배포 도메인 추가
 ]
 
