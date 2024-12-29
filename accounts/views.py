@@ -99,8 +99,7 @@ class KakaoLoginView(views.APIView):
 
 class KakaoCallbackView(views.APIView):
     def get(self, request):
-
-        code = request.GET.get('code') #access_token 발급 위함
+        code = request.GET.get('code')  # access_token 발급 위함
 
         if not code:
             return Response(status=HTTP_400_BAD_REQUEST)
@@ -124,11 +123,12 @@ class KakaoCallbackView(views.APIView):
         
         token_json = token_res.json()
         access_token = token_json.get('access_token')
+        refresh_token = token_json.get('refresh_token')
 
         if not access_token:
             return Response(status=HTTP_400_BAD_REQUEST)
 
-        auth_headers = { # 사용자 정보 불러오기
+        auth_headers = {  # 사용자 정보 불러오기
             "Authorization": f"Bearer {access_token}",
             "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
         }
@@ -140,25 +140,43 @@ class KakaoCallbackView(views.APIView):
         social_id = str(user_info_json.get('id'))
         email = user_info_json.get('kakao_account', {}).get('email')
 
-        # 회원가입 및 로그인 처리 
+        # 회원가입 및 로그인 처리
         try:   
             user_in_db = User.objects.get(email=email) 
-            # kakao계정 아이디가 이미 가입한거라면
-            # 서비스에 rest-auth 로그인
-            data={'email':email,'password':KAKAO_PASSWORD}
+            # Kakao 계정 아이디가 이미 가입된 경우
+            data = {'email': email, 'password': KAKAO_PASSWORD}
             serializer = KakaoLoginSerializer(data=data)
             if serializer.is_valid():
                 validated_data = serializer.validated_data
                 validated_data['exist'] = True
-                # 로그인 후 발급된 access token과 함께 응답
-                # validated_data['access_token'] = serializer.data.access_token
-                
-                return Response({'message': "카카오 로그인 성공", 'data': validated_data}, status=HTTP_200_OK)
+
+                # 쿠키 설정
+                res = Response({'message': "카카오 로그인 성공", 'data': validated_data}, status=HTTP_200_OK)
+                res.set_cookie(
+                    "accessToken", value=access_token, max_age=None, expires=None, 
+                    secure=True, samesite="None", httponly=True
+                )
+                res.set_cookie(
+                    "refreshToken", value=refresh_token, max_age=None, expires=None, 
+                    secure=True, samesite="None", httponly=True
+                )
+                return res
+
             return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
         except User.DoesNotExist:
             # 카카오 회원가입으로 리다이렉트
-            return redirect(f'/accounts/kakao/signup/?email={email}')
+            res = redirect(f'/accounts/kakao/signup/?email={email}')
+            res.set_cookie(
+                "accessToken", value=access_token, max_age=None, expires=None, 
+                secure=True, samesite="None", httponly=True
+            )
+            res.set_cookie(
+                "refreshToken", value=refresh_token, max_age=None, expires=None, 
+                secure=True, samesite="None", httponly=True
+            )
+            return res
+
 
 class KakaoSignupView(views.APIView):
     def get(self, request):  
