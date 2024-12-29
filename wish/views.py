@@ -334,7 +334,8 @@ class WishItemView(views.APIView):
         else:
             logger.error("item_image, 유효한 이미지 URL, 또는 Base64 데이터를 제공해야 합니다.")
             return Response({"error": "item_image, 유효한 이미지 URL, 또는 Base64 데이터를 제공해야 합니다."}, status=HTTP_400_BAD_REQUEST)
-
+        data = request.data.copy()
+        data['item_image'] = image_content
     patch_serializer = WishPostSerializer(wishitem, data=data, partial=True)
     if patch_serializer.is_valid():
         patch_serializer.save()
