@@ -190,6 +190,7 @@ class KakaoCallbackView(views.APIView):
                     'access_token': access_token,  # 로그인 후 사용할 access token
                     } 
                 return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
+            logger.error(f"{serializer.errors}")
             return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
     
 
