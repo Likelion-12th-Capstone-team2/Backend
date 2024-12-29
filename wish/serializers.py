@@ -24,3 +24,5 @@ class ToMyWishSerializer(serializers.ModelSerializer):
   class Meta:
     model = Wish
     fields = ['id', 'item_name', 'wish_link', 'item_image', 'price', 'size', 'color', 'other_option']
+
+    
