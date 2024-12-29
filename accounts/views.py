@@ -164,7 +164,7 @@ class KakaoCallbackView(views.APIView):
                 )
                 return res
 
-            #return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
+            return Response({'message': "카카오 로그인 실패", 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
         # 이메일 정보가 없는 경우
         if not email:
@@ -173,9 +173,8 @@ class KakaoCallbackView(views.APIView):
         # 회원가입 처리
         request_data = {
             'email': email,
-            'password': KAKAO_PASSWORD,  # 미리 정의된 카카오 비밀번호 사용
+            'password': KAKAO_PASSWORD,
         }
-
         serializer = KakaoLoginSerializer(data=request_data)
         if serializer.is_valid():
             user = serializer.save()
@@ -188,9 +187,10 @@ class KakaoCallbackView(views.APIView):
                 'id': user.id,
                 'email': user.email,
                 'username': user.username,
-                'access_token': access_token,  # 로그인 후 사용할 access token
-                } 
+                'access_token': access_token,
+            }
             return Response({'message': '카카오계정 통한 회원가입 및 로그인 완료', 'data': user_data}, status=HTTP_201_CREATED)
+
         return Response({'message': '카카오계정 통한 회원가입 오류', 'error': serializer.errors}, status=HTTP_400_BAD_REQUEST)
     
 
