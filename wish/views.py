@@ -235,7 +235,7 @@ class WishItemView(views.APIView):
       logger.debug("No sender provided")
 
     
-
+    logger.debug(f"response_data: {response_data}")
     return Response(data=response_data, status=HTTP_200_OK)
 
   def patch(self, request, item_id):
