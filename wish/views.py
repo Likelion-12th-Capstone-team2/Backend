@@ -441,7 +441,10 @@ class SendView(views.APIView):
                 logger.debug(f"{alarm_serializer.errors}")
                 return Response({"error": alarm_serializer.errors}, status=HTTP_400_BAD_REQUEST)
       alarm_serializer.save()
-      return Response(serializer.data, status=HTTP_200_OK)
+      sender = get_object_or_404(MyPage, user=request.user)
+      data = serializer.data
+      data['sender'] = sender.name
+      return Response(data=data, status=HTTP_200_OK)
       
 
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
