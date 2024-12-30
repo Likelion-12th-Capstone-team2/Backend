@@ -452,11 +452,13 @@ class SendView(views.APIView):
   def delete(self, request, user_id, item_id):
     # 로그인을 안한 경우 400 오류
     if not request.user.is_authenticated:
+      logger.error("로그인 후 선물하기 찜을 취소할 수 있습니다.")
       return Response({"error": "로그인 후 선물하기 찜을 취소할 수 있습니다."}, status=HTTP_400_BAD_REQUEST)
     wishitem = get_object_or_404(Wish, id=item_id)
 
     # 선물 보낸 사람인지 확인
     if wishitem.sender != request.user:
+      logger.error("취소 권한이 없습니다.")
       return Response({"error": "취소 권한이 없습니다."}, status=HTTP_400_BAD_REQUEST)
 
       # 선물 상태 초기화
@@ -466,7 +468,7 @@ class SendView(views.APIView):
 
     # 관련 알람 삭제
     Alarm.objects.filter(sender=request.user, receiver_id=user_id, item=wishitem).delete()
-
+    logger.debug("선물하기 찜 취소 성공!")
     return Response({"message": "선물하기 찜 취소 성공!"}, status=HTTP_200_OK)
 
 
