@@ -214,14 +214,19 @@ class WishItemView(views.APIView):
       mypage_serializer_data = mypage_serializer.data
     except Http404:
       mypage_serializer_data = None
-
+    response_data = {
+      'user': user,
+      'item': data,
+      'receiver_id': mypage.user.id,
+      'setting': mypage_serializer_data
+    }
     # sender 정보 -> mypage name으로 수정
     if data['sender']:
       logger.debug(f"Attempting to get MyPage for sender: {data['sender']}")
       try:
           sender = get_object_or_404(MyPage, user=int(data['sender']))
           sender_serializer = MyPageSerializer(sender)
-          data['sender'] = sender_serializer.data['name']
+          response_data['sender'] = sender_serializer.data['name']
           logger.debug(f"Sender found: {data['sender']}")
       except Http404:
           logger.warning(f"MyPage not found for sender: {data['sender']}. Using user_id as fallback.")
@@ -230,12 +235,6 @@ class WishItemView(views.APIView):
       logger.debug("No sender provided")
 
     
-    response_data = {
-      'user': user,
-      'item': data,
-      'receiver_id': mypage.user.id,
-      'setting': mypage_serializer_data
-    }
 
     return Response(data=response_data, status=HTTP_200_OK)
 
